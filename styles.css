@@ -229,6 +229,10 @@ body {
 .btn--small { padding: 10px 20px; font-size: 0.9rem; }
 .btn--large { padding: 20px 38px; font-size: 1.1rem; }
 
+@media (max-width: 480px) {
+  .btn--large { padding: 16px 22px; font-size: 0.95rem; }
+}
+
 .btn__arrow { transition: transform 0.35s var(--ease-spring); }
 .btn:hover .btn__arrow { transform: translateX(5px); }
 
