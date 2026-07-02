@@ -73,21 +73,113 @@ if (glow && !prefersReducedMotion) {
   })();
 }
 
-/* ---------- Blob parallax on mouse ---------- */
+/* ---------- Unified motion loop: progress bar, hero parallax, blobs ---------- */
 
-if (!prefersReducedMotion && matchMedia("(hover: hover)").matches) {
-  const blobs = document.querySelectorAll(".blob");
-  window.addEventListener("mousemove", (e) => {
-    const nx = e.clientX / innerWidth - 0.5;
-    const ny = e.clientY / innerHeight - 0.5;
+(function initMotion() {
+  const progress = document.querySelector(".scroll-progress");
+  const heroContent = document.querySelector(".hero__content");
+  const blobs = [...document.querySelectorAll(".blob")];
+  const blobDrift = [0.05, -0.06, 0.04];
+  let mouseNX = 0, mouseNY = 0;
+  let pending = false;
+
+  function apply() {
+    pending = false;
+    const y = window.scrollY;
+
+    if (progress) {
+      const max = document.documentElement.scrollHeight - innerHeight;
+      progress.style.transform = `scaleX(${max > 0 ? Math.min(y / max, 1) : 0})`;
+    }
+
+    if (prefersReducedMotion) return;
+
+    // hero shrinks and fades as it scrolls out of view
+    if (heroContent && y < innerHeight) {
+      const p = y / innerHeight;
+      heroContent.style.transform = `translateY(${y * 0.3}px) scale(${1 - p * 0.1})`;
+      heroContent.style.opacity = Math.max(1 - p * 1.15, 0);
+    }
+
+    // blobs: mouse parallax + slow scroll drift for depth.
+    // Margins are used because transform belongs to the drift keyframes.
     blobs.forEach((blob, i) => {
       const depth = (i + 1) * 14;
-      // Offset via CSS variables would fight the drift keyframes,
-      // so shift the blob's parent-relative position instead.
-      blob.style.marginLeft = nx * depth + "px";
-      blob.style.marginTop = ny * depth + "px";
+      blob.style.marginLeft = mouseNX * depth + "px";
+      blob.style.marginTop = mouseNY * depth + y * blobDrift[i] + "px";
     });
-  }, { passive: true });
+  }
+
+  function request() {
+    if (!pending) {
+      pending = true;
+      requestAnimationFrame(apply);
+    }
+  }
+
+  window.addEventListener("scroll", request, { passive: true });
+  if (matchMedia("(hover: hover)").matches) {
+    window.addEventListener("mousemove", (e) => {
+      mouseNX = e.clientX / innerWidth - 0.5;
+      mouseNY = e.clientY / innerHeight - 0.5;
+      request();
+    }, { passive: true });
+  }
+  request();
+})();
+
+/* ---------- Word-by-word title reveal ---------- */
+
+if (!prefersReducedMotion && "IntersectionObserver" in window) {
+  const titles = [...document.querySelectorAll(".section__title")];
+
+  titles.forEach((title) => {
+    let wi = 0;
+    (function walk(node) {
+      [...node.childNodes].forEach((child) => {
+        if (child.nodeType === Node.TEXT_NODE) {
+          const frag = document.createDocumentFragment();
+          child.textContent.split(/(\s+)/).forEach((part) => {
+            if (!part) return;
+            if (/^\s+$/.test(part)) {
+              frag.appendChild(document.createTextNode(part));
+              return;
+            }
+            const w = document.createElement("span");
+            w.className = "word";
+            w.style.setProperty("--wi", wi++);
+            w.textContent = part;
+            frag.appendChild(w);
+          });
+          child.replaceWith(frag);
+        } else if (child.nodeType === Node.ELEMENT_NODE && child.tagName !== "BR") {
+          walk(child);
+        }
+      });
+    })(title);
+    title.classList.add("split");
+  });
+
+  const titleObserver = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add("words-in");
+          titleObserver.unobserve(entry.target);
+        }
+      });
+    },
+    { threshold: 0.3 }
+  );
+
+  titles.forEach((t) => titleObserver.observe(t));
+
+  // same watchdog idea as the section reveals
+  setTimeout(() => {
+    titles.forEach((t) => {
+      if (t.getBoundingClientRect().top < innerHeight) t.classList.add("words-in");
+    });
+  }, 3000);
 }
 
 /* ---------- 3D tilt cards + spotlight tracking ---------- */
@@ -193,6 +285,7 @@ document.querySelectorAll(".counter").forEach((el) => {
     index = (i + slides) % slides;
     track.style.transform = `translateX(-${index * 100}%)`;
     dots.forEach((d, j) => d.classList.toggle("is-active", j === index));
+    [...track.children].forEach((q, j) => q.classList.toggle("is-active", j === index));
     if (manual) restartAutoplay();
   }
 

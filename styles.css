@@ -93,6 +93,19 @@ body {
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.06'/%3E%3C/svg%3E");
 }
 
+/* ============ Scroll progress ============ */
+
+.scroll-progress {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  z-index: 200;
+  background: linear-gradient(90deg, var(--accent-3), var(--accent-1), var(--accent-2));
+  transform: scaleX(0);
+  transform-origin: left;
+  pointer-events: none;
+}
+
 /* ============ Cursor glow ============ */
 
 .cursor-glow {
@@ -206,8 +219,28 @@ body {
 }
 
 .btn--primary {
+  position: relative;
+  overflow: hidden;
   background: linear-gradient(120deg, var(--accent-1), var(--accent-2));
   box-shadow: 0 8px 32px rgba(94, 92, 230, 0.35);
+}
+
+/* periodic light streak sweeping across primary buttons */
+.btn--primary::after {
+  content: "";
+  position: absolute;
+  top: 0; bottom: 0;
+  left: -60%;
+  width: 45%;
+  background: linear-gradient(105deg, transparent, rgba(255, 255, 255, 0.35), transparent);
+  transform: skewX(-20deg);
+  animation: sheen 4.5s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes sheen {
+  0%, 55% { left: -60%; }
+  100%    { left: 140%; }
 }
 
 .btn--primary:hover { box-shadow: 0 12px 48px rgba(94, 92, 230, 0.55); }
@@ -434,6 +467,46 @@ body {
   line-height: 1.08;
 }
 
+/* --- word-by-word blur reveal (spans injected by JS only) --- */
+
+.section__title .word {
+  display: inline-block;
+  opacity: 0;
+  transform: translateY(0.35em);
+  filter: blur(14px);
+  will-change: transform, filter;
+}
+
+.section__title.words-in .word {
+  animation: word-in 0.7s var(--ease-spring) forwards;
+  animation-delay: calc(var(--wi) * 0.07s);
+}
+
+@keyframes word-in {
+  to { opacity: 1; transform: translateY(0); filter: blur(0); }
+}
+
+/* once split into words, the gradient is painted per word so the
+   per-word transform/filter can't glitch background-clip on the parent */
+.section__title.split .text-gradient {
+  background: none;
+  animation: none;
+}
+
+.section__title.split .text-gradient .word {
+  background: linear-gradient(100deg, var(--accent-3), var(--accent-1) 45%, var(--accent-2));
+  background-size: 200% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.section__title.split.words-in .text-gradient .word {
+  animation: word-in 0.7s var(--ease-spring) forwards,
+             gradient-shift 7s ease-in-out infinite alternate;
+  animation-delay: calc(var(--wi) * 0.07s);
+}
+
 /* ============ Glass utility ============ */
 
 .glass {
@@ -542,6 +615,26 @@ body {
   margin-top: 12px;
   background: linear-gradient(var(--border), transparent);
 }
+
+/* timeline draws itself in as each step becomes visible (JS on only) */
+.js .step .step__marker span {
+  opacity: 0;
+  transform: scale(0.4);
+  transition: opacity 0.6s var(--ease-spring) 0.15s, transform 0.6s var(--ease-spring) 0.15s;
+}
+
+.js .step.is-visible .step__marker span {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.js .step .step__line {
+  transform: scaleY(0);
+  transform-origin: top;
+  transition: transform 1s ease 0.35s;
+}
+
+.js .step.is-visible .step__line { transform: scaleY(1); }
 
 .step__body h3 {
   font-size: 1.35rem;
@@ -705,6 +798,18 @@ body {
   flex: 0 0 100%;
   padding: 44px clamp(24px, 6vw, 72px);
   text-align: center;
+}
+
+/* inactive slides recede (JS on only — is-active is set by the script) */
+.js .quote {
+  opacity: 0.25;
+  transform: scale(0.94);
+  transition: opacity 0.6s ease, transform 0.6s var(--ease-spring);
+}
+
+.js .quote.is-active {
+  opacity: 1;
+  transform: scale(1);
 }
 
 .quote blockquote {
