@@ -23,19 +23,33 @@ revealEls.forEach((el) => {
   if (i > 0) el.style.setProperty("--reveal-delay", `${Math.min(i * 0.09, 0.45)}s`);
 });
 
-const revealObserver = new IntersectionObserver(
-  (entries) => {
-    entries.forEach((entry) => {
-      if (entry.isIntersecting) {
-        entry.target.classList.add("is-visible");
-        revealObserver.unobserve(entry.target);
+if ("IntersectionObserver" in window) {
+  const revealObserver = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add("is-visible");
+          revealObserver.unobserve(entry.target);
+        }
+      });
+    },
+    { threshold: 0.15, rootMargin: "0px 0px -40px 0px" }
+  );
+
+  revealEls.forEach((el) => revealObserver.observe(el));
+
+  // Watchdog: if anything in the viewport is still hidden a few seconds
+  // after load (observer quirks in embedded browsers), reveal it.
+  setTimeout(() => {
+    revealEls.forEach((el) => {
+      if (el.getBoundingClientRect().top < innerHeight) {
+        el.classList.add("is-visible");
       }
     });
-  },
-  { threshold: 0.15, rootMargin: "0px 0px -40px 0px" }
-);
-
-revealEls.forEach((el) => revealObserver.observe(el));
+  }, 3000);
+} else {
+  revealEls.forEach((el) => el.classList.add("is-visible"));
+}
 
 /* ---------- Cursor glow ---------- */
 
@@ -131,22 +145,25 @@ function animateCounter(el) {
   })(start);
 }
 
-const counterObserver = new IntersectionObserver(
-  (entries) => {
-    entries.forEach((entry) => {
-      if (entry.isIntersecting) {
-        animateCounter(entry.target);
-        counterObserver.unobserve(entry.target);
-      }
-    });
-  },
-  { threshold: 0.6 }
-);
+const counterObserver = "IntersectionObserver" in window
+  ? new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            animateCounter(entry.target);
+            counterObserver.unobserve(entry.target);
+          }
+        });
+      },
+      { threshold: 0.6 }
+    )
+  : null;
 
+// Counters hold their final value in the HTML (so they read correctly
+// without JS); zero them out only once we know we can animate.
 document.querySelectorAll(".counter").forEach((el) => {
-  if (prefersReducedMotion) {
-    el.textContent = el.dataset.target;
-  } else {
+  if (!prefersReducedMotion && "IntersectionObserver" in window) {
+    el.textContent = "0";
     counterObserver.observe(el);
   }
 });

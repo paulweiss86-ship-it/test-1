@@ -820,15 +820,17 @@ body {
 .footer__links a:hover { color: var(--text); }
 
 /* ============ Scroll reveal ============ */
+/* Hidden state is gated behind html.js so content stays visible
+   in browsers where JavaScript is disabled or blocked. */
 
-.reveal {
+.js .reveal {
   opacity: 0;
   transform: translateY(36px);
   transition: opacity 0.9s var(--ease-spring), transform 0.9s var(--ease-spring);
   transition-delay: var(--reveal-delay, 0s);
 }
 
-.reveal.is-visible {
+.js .reveal.is-visible {
   opacity: 1;
   transform: translateY(0);
 }
