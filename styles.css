@@ -829,7 +829,7 @@ html.cursor-on, html.cursor-on * { cursor: none !important; }
 .card:hover::before { opacity: 1; }
 .card:hover { border-color: rgba(255, 255, 255, 0.18); }
 
-/* rotating conic gradient border on hover (cards + work items) */
+/* purple laser orbiting the tile borders (cards + work items) */
 @property --angle {
   syntax: "<angle>";
   initial-value: 0deg;
@@ -842,25 +842,39 @@ html.cursor-on, html.cursor-on * { cursor: none !important; }
   position: absolute;
   inset: -1px;
   border-radius: var(--radius);
-  padding: 1px;
+  padding: 2px;
+  /* a comet: long fading tail building to a hot head, then a sharp cut */
   background: conic-gradient(from var(--angle),
-    transparent 8%,
-    rgba(100, 210, 255, 0.9) 18%,
-    rgba(94, 92, 230, 0.9) 30%,
-    rgba(191, 90, 242, 0.9) 42%,
-    transparent 55%);
+    transparent 0turn,
+    transparent 0.70turn,
+    rgba(191, 90, 242, 0.3) 0.80turn,
+    rgba(191, 90, 242, 0.8) 0.90turn,
+    rgba(216, 130, 255, 1) 0.97turn,
+    #f4d6ff 0.995turn,
+    transparent 1turn);
   -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
   -webkit-mask-composite: xor;
           mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
           mask-composite: exclude;
-  opacity: 0;
-  transition: opacity 0.5s;
-  animation: border-spin 3.5s linear infinite;
+  filter: drop-shadow(0 0 7px rgba(191, 90, 242, 0.9));
+  opacity: 0.9;
+  transition: opacity 0.4s, filter 0.4s;
+  animation: border-spin 4.5s linear infinite;
   pointer-events: none;
 }
 
 .card:hover::after,
-.work__item:hover::after { opacity: 1; }
+.work__item:hover::after {
+  opacity: 1;
+  filter: drop-shadow(0 0 11px rgba(191, 90, 242, 0.95));
+}
+
+/* desynchronize the lasers so the grid shimmers instead of marching */
+.card:nth-child(2)::after      { animation-delay: -1.3s; }
+.card:nth-child(3)::after      { animation-delay: -2.5s; }
+.card:nth-child(4)::after      { animation-delay: -3.6s; }
+.work__item:nth-child(2)::after { animation-delay: -1.7s; }
+.work__item:nth-child(3)::after { animation-delay: -3.1s; }
 
 @keyframes border-spin {
   to { --angle: 360deg; }
