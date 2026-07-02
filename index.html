@@ -5,24 +5,39 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Paul Weiss — AI Consultant</title>
   <meta name="description" content="Paul Weiss is an independent AI consultant helping companies design, build, and ship AI that actually works — from strategy to production." />
-  <script>document.documentElement.classList.add("js");</script>
+  <script>
+    document.documentElement.classList.add("js", "loading");
+    // failsafe: never leave the page stuck behind the loader
+    setTimeout(function () { document.documentElement.classList.remove("loading"); }, 3000);
+  </script>
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
+
+  <!-- Intro loader -->
+  <div class="loader" aria-hidden="true">
+    <div class="loader__inner">
+      <div class="loader__logo">PW<span>.</span></div>
+      <div class="loader__bar"><span></span></div>
+    </div>
+  </div>
 
   <!-- Scroll progress -->
   <div class="scroll-progress" aria-hidden="true"></div>
 
   <!-- Ambient background -->
   <div class="ambient" aria-hidden="true">
+    <div class="aurora"></div>
     <div class="blob blob--1"></div>
     <div class="blob blob--2"></div>
     <div class="blob blob--3"></div>
     <div class="grain"></div>
   </div>
 
-  <!-- Cursor glow -->
+  <!-- Cursor glow + custom cursor -->
   <div class="cursor-glow" aria-hidden="true"></div>
+  <div class="cursor-dot" aria-hidden="true"></div>
+  <div class="cursor-ring" aria-hidden="true"></div>
 
   <!-- Navigation -->
   <header class="nav" id="nav">
@@ -42,6 +57,7 @@
 
     <!-- ================= HERO ================= -->
     <section class="hero">
+      <canvas class="hero-canvas" aria-hidden="true"></canvas>
       <div class="hero__content">
         <p class="hero__eyebrow reveal-line"><span class="pulse-dot"></span> Available for new projects</p>
         <h1 class="hero__title">
