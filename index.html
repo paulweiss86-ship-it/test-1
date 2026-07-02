@@ -50,8 +50,23 @@
         <li><a href="#about">About</a></li>
       </ul>
       <a href="#contact" class="btn btn--small btn--glass magnetic">Get in touch</a>
+      <button class="nav__burger" aria-label="Open menu" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
     </nav>
   </header>
+
+  <!-- Mobile menu overlay -->
+  <div class="mobile-menu" aria-hidden="true">
+    <nav class="mobile-menu__nav">
+      <a href="#services" style="--i: 0">Services</a>
+      <a href="#process" style="--i: 1">Process</a>
+      <a href="#work" style="--i: 2">Work</a>
+      <a href="#about" style="--i: 3">About</a>
+      <a href="#contact" style="--i: 4">Get in touch</a>
+    </nav>
+    <a class="mobile-menu__mail" style="--i: 5" href="mailto:paulweiss86@gmail.com">paulweiss86@gmail.com</a>
+  </div>
 
   <main id="top">
 

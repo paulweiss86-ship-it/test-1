@@ -26,6 +26,7 @@ const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)
     finished = true;
     html.classList.remove("loading");
     loader.classList.add("is-done");
+    document.dispatchEvent(new CustomEvent("pw:loaded"));
     setTimeout(() => loader.remove(), 900);
   };
 
@@ -92,7 +93,7 @@ if ("IntersectionObserver" in window) {
   const ctx = canvas.getContext("2d");
   const COLORS = ["94,92,230", "191,90,242", "100,210,255"];
   const LINK_DIST = 130;
-  let w, h, particles = [];
+  let w, h, particles = [], sparks = [];
   let raf = null;
   const mouse = { x: -9999, y: -9999 };
 
@@ -104,15 +105,54 @@ if ("IntersectionObserver" in window) {
     canvas.height = h * dpr;
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     const count = Math.min(Math.floor(w / 14), 110);
-    particles = Array.from({ length: count }, () => ({
-      x: Math.random() * w,
-      y: Math.random() * h,
-      vx: (Math.random() - 0.5) * 0.35,
-      vy: (Math.random() - 0.5) * 0.35,
-      r: Math.random() * 1.8 + 0.6,
-      c: COLORS[(Math.random() * COLORS.length) | 0],
-    }));
+    particles = Array.from({ length: count }, () => {
+      const bvx = (Math.random() - 0.5) * 0.35;
+      const bvy = (Math.random() - 0.5) * 0.35;
+      return {
+        x: Math.random() * w,
+        y: Math.random() * h,
+        vx: bvx, vy: bvy,   // current velocity
+        bvx, bvy,           // base drift it always eases back to
+        r: Math.random() * 1.8 + 0.6,
+        c: COLORS[(Math.random() * COLORS.length) | 0],
+      };
+    });
   }
+
+  // launch moment: gather everything at the center and blast it outward;
+  // the easing back to base velocity settles it into the normal drift
+  let burstDone = false;
+  function burst() {
+    if (burstDone || !particles.length) return;
+    burstDone = true;
+    for (const p of particles) {
+      p.x = w / 2 + (Math.random() - 0.5) * 60;
+      p.y = h * 0.45 + (Math.random() - 0.5) * 60;
+      const angle = Math.random() * Math.PI * 2;
+      const speed = 2 + Math.random() * 8;
+      p.vx = Math.cos(angle) * speed;
+      p.vy = Math.sin(angle) * speed;
+    }
+  }
+  document.addEventListener("pw:loaded", burst, { once: true });
+  setTimeout(burst, 3200); // in case the loader never announced itself
+
+  // tap / click sparks
+  canvas.parentElement.addEventListener("pointerdown", (e) => {
+    const r = canvas.getBoundingClientRect();
+    const x = e.clientX - r.left, y = e.clientY - r.top;
+    for (let i = 0; i < 14 && sparks.length < 90; i++) {
+      const angle = Math.random() * Math.PI * 2;
+      const speed = 1.5 + Math.random() * 4.5;
+      sparks.push({
+        x, y,
+        vx: Math.cos(angle) * speed,
+        vy: Math.sin(angle) * speed,
+        life: 1,
+        c: COLORS[(Math.random() * COLORS.length) | 0],
+      });
+    }
+  }, { passive: true });
 
   function step() {
     ctx.clearRect(0, 0, w, h);
@@ -120,6 +160,9 @@ if ("IntersectionObserver" in window) {
     for (const p of particles) {
       p.x += p.vx;
       p.y += p.vy;
+      // ease back toward the base drift (no-op unless bursting)
+      p.vx += (p.bvx - p.vx) * 0.03;
+      p.vy += (p.bvy - p.vy) * 0.03;
       const dx = mouse.x - p.x, dy = mouse.y - p.y;
       if (dx * dx + dy * dy < 160 * 160) {
         p.x += dx * 0.004;
@@ -127,9 +170,25 @@ if ("IntersectionObserver" in window) {
       }
       if (p.x < 0 || p.x > w) p.vx *= -1;
       if (p.y < 0 || p.y > h) p.vy *= -1;
+      p.x = Math.max(0, Math.min(w, p.x));
+      p.y = Math.max(0, Math.min(h, p.y));
       ctx.beginPath();
       ctx.arc(p.x, p.y, p.r, 0, 7);
       ctx.fillStyle = `rgba(${p.c},0.7)`;
+      ctx.fill();
+    }
+
+    for (let i = sparks.length - 1; i >= 0; i--) {
+      const s = sparks[i];
+      s.x += s.vx;
+      s.y += s.vy;
+      s.vx *= 0.96;
+      s.vy *= 0.96;
+      s.life -= 0.022;
+      if (s.life <= 0) { sparks.splice(i, 1); continue; }
+      ctx.beginPath();
+      ctx.arc(s.x, s.y, 1.6 * s.life + 0.4, 0, 7);
+      ctx.fillStyle = `rgba(${s.c},${s.life * 0.9})`;
       ctx.fill();
     }
 
@@ -242,9 +301,11 @@ if (glow && !prefersReducedMotion) {
 (function initMotion() {
   const progress = document.querySelector(".scroll-progress");
   const heroContent = document.querySelector(".hero__content");
+  const marquee = document.querySelector(".marquee");
   const blobs = [...document.querySelectorAll(".blob")];
   const blobDrift = [0.05, -0.06, 0.04];
   let mouseNX = 0, mouseNY = 0;
+  let lastY = window.scrollY, skew = 0;
   let pending = false;
 
   function apply() {
@@ -256,7 +317,7 @@ if (glow && !prefersReducedMotion) {
       progress.style.transform = `scaleX(${max > 0 ? Math.min(y / max, 1) : 0})`;
     }
 
-    if (prefersReducedMotion) return;
+    if (prefersReducedMotion) { lastY = y; return; }
 
     // hero shrinks and fades as it scrolls out of view
     if (heroContent && y < innerHeight) {
@@ -265,7 +326,14 @@ if (glow && !prefersReducedMotion) {
       heroContent.style.opacity = Math.max(1 - p * 1.15, 0);
     }
 
-    // blobs: mouse parallax + slow scroll drift for depth.
+    // logo marquee skews with scroll velocity, then relaxes
+    const velocity = y - lastY;
+    lastY = y;
+    skew += (Math.max(-8, Math.min(8, -velocity * 0.25)) - skew) * 0.18;
+    if (marquee) marquee.style.transform = `skewX(${skew.toFixed(2)}deg)`;
+    if (Math.abs(skew) > 0.05) request(); // keep relaxing after scroll stops
+
+    // blobs: pointer/tilt parallax + slow scroll drift for depth.
     // Margins are used because transform belongs to the drift keyframes.
     blobs.forEach((blob, i) => {
       const depth = (i + 1) * 14;
@@ -282,14 +350,57 @@ if (glow && !prefersReducedMotion) {
   }
 
   window.addEventListener("scroll", request, { passive: true });
+
   if (matchMedia("(hover: hover)").matches) {
     window.addEventListener("mousemove", (e) => {
       mouseNX = e.clientX / innerWidth - 0.5;
       mouseNY = e.clientY / innerHeight - 0.5;
       request();
     }, { passive: true });
+  } else if (window.DeviceOrientationEvent && !prefersReducedMotion) {
+    // touch devices: tilt the phone to move the liquid background
+    const onTilt = (e) => {
+      if (e.gamma == null || e.beta == null) return;
+      mouseNX = Math.max(-0.9, Math.min(0.9, e.gamma / 25));
+      mouseNY = Math.max(-0.9, Math.min(0.9, (e.beta - 40) / 25));
+      request();
+    };
+    const attach = () =>
+      window.addEventListener("deviceorientation", onTilt, { passive: true });
+    if (typeof DeviceOrientationEvent.requestPermission === "function") {
+      // iOS only grants motion access after a user gesture
+      window.addEventListener("touchend", function ask() {
+        DeviceOrientationEvent.requestPermission()
+          .then((state) => { if (state === "granted") attach(); })
+          .catch(() => {});
+      }, { once: true, passive: true });
+    } else {
+      attach();
+    }
   }
+
   request();
+})();
+
+/* ---------- Mobile menu ---------- */
+
+(function initMobileMenu() {
+  const burger = document.querySelector(".nav__burger");
+  const menu = document.querySelector(".mobile-menu");
+  if (!burger || !menu) return;
+
+  const set = (open) => {
+    menu.classList.toggle("is-open", open);
+    burger.classList.toggle("is-open", open);
+    burger.setAttribute("aria-expanded", String(open));
+    menu.setAttribute("aria-hidden", String(!open));
+    document.body.style.overflow = open ? "hidden" : "";
+  };
+
+  burger.addEventListener("click", () => set(!menu.classList.contains("is-open")));
+  menu.querySelectorAll("a").forEach((a) =>
+    a.addEventListener("click", () => set(false))
+  );
 })();
 
 /* ---------- Word-by-word title reveal ---------- */
@@ -527,6 +638,41 @@ document.querySelectorAll(".btn").forEach((btn) => {
   document.querySelectorAll(".carousel__btn").forEach((btn) => {
     btn.addEventListener("click", () => goTo(index + parseInt(btn.dataset.dir, 10), true));
   });
+
+  // swipe: track follows the finger, then snaps
+  const viewport = document.querySelector(".carousel__viewport");
+  if (viewport && window.PointerEvent) {
+    let startX = 0, dx = 0, dragging = false;
+    viewport.style.touchAction = "pan-y"; // browser keeps vertical scroll
+
+    viewport.addEventListener("pointerdown", (e) => {
+      dragging = true;
+      startX = e.clientX;
+      dx = 0;
+      track.style.transition = "none";
+      clearInterval(timer);
+      viewport.setPointerCapture(e.pointerId);
+    });
+
+    viewport.addEventListener("pointermove", (e) => {
+      if (!dragging) return;
+      dx = e.clientX - startX;
+      track.style.transform = `translateX(calc(-${index * 100}% + ${dx}px))`;
+    });
+
+    const endDrag = () => {
+      if (!dragging) return;
+      dragging = false;
+      track.style.transition = "";
+      const threshold = viewport.clientWidth * 0.18;
+      if (dx < -threshold) goTo(index + 1, true);
+      else if (dx > threshold) goTo(index - 1, true);
+      else goTo(index, true);
+    };
+
+    viewport.addEventListener("pointerup", endDrag);
+    viewport.addEventListener("pointercancel", endDrag);
+  }
 
   goTo(0);
   restartAutoplay();
