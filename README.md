@@ -55,7 +55,15 @@ joystick + touch buttons).
   Contract* (40-point shield).
 - **Combo scoring** with multiplier and tier bonuses (tempo refill at ×5,
   instant ultimate at ×10); best score kept in `localStorage`.
-- **Overtime mode** after victory: endless escalating waves.
+- **Career ladder:** every run banks its score as lifetime billings — nine ranks
+  from Intern to Name On The Door, with promotions announced on the end screens.
+- **Overtime mode** after victory: endless escalating waves with red **elite**
+  variants worth triple score.
+- **Presentation:** letterboxed boss-intro cinematic (any key skips), slow-motion
+  death sequence, camera shake, hitstop, critical hits, floating damage numbers,
+  screen-edge threat arrows, and a boss-phase music shift.
+- **Settings** (pause menu): music/SFX volume, mouse speed, invert Y, bloom and
+  rain toggles — persisted between sessions.
 - Synthesized soundtrack and SFX via WebAudio — zero audio files.
 
 ## Tech notes

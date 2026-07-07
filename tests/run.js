@@ -193,10 +193,18 @@ function check(name, cond, extra) {
 
   // ---- boss ----
   await page.evaluate(() => window.__AH.skipToBoss());
-  await page.waitForTimeout(1500);
+  st = await page.evaluate(() => window.__AH.state());
+  check('boss intro cinematic plays', st.mode === 'cinematic', `mode=${st.mode}`);
+  await page.waitForTimeout(900);
+  await page.screenshot({ path: path.join(shotsDir, '05-boss.png') });
+  await page.evaluate(() => window.__AH.skipCine());
+  const cineEnds = await page.waitForFunction(
+    () => window.__AH.state().mode === 'playing',
+    null, { timeout: 8000 }
+  ).then(() => true).catch(() => false);
+  check('cinematic hands control back', cineEnds);
   st = await page.evaluate(() => window.__AH.state());
   check('boss spawns on final wave', st.boss !== null, JSON.stringify(st.boss));
-  await page.screenshot({ path: path.join(shotsDir, '05-boss.png') });
 
   // boss fires hazards eventually (radial burst every ~3.2 game-seconds)
   const bossAtkOk = await page.waitForFunction(
@@ -218,13 +226,20 @@ function check(name, cond, extra) {
   check('victory after boss dies', st.mode === 'victory', `mode=${st.mode}`);
   await page.screenshot({ path: path.join(shotsDir, '06-victory.png') });
 
-  // ---- game over path ----
+  // ---- game over path (death sequence → terminated screen) ----
+  const xpBefore = (await page.evaluate(() => window.__AH.state())).xp;
   await page.evaluate(() => document.getElementById('btn-restart-v').click());
   await page.waitForTimeout(600);
   await page.evaluate(() => { window.__AH.god(false); window.__AH.hurt(9999); });
-  await page.waitForTimeout(400);
   st = await page.evaluate(() => window.__AH.state());
-  check('game over when hp reaches 0', st.mode === 'gameover', `mode=${st.mode}`);
+  check('death plays a dying sequence first', st.mode === 'dying', `mode=${st.mode}`);
+  const goOk = await page.waitForFunction(
+    () => window.__AH.state().mode === 'gameover',
+    null, { timeout: 20000 }
+  ).then(() => true).catch(() => false);
+  check('game over when hp reaches 0', goOk);
+  st = await page.evaluate(() => window.__AH.state());
+  check('score banks into career XP', st.xp >= xpBefore, `xp ${xpBefore}→${st.xp} rank=${st.rank}`);
   await page.screenshot({ path: path.join(shotsDir, '07-gameover.png') });
 
   // ---- retry from game over ----
@@ -240,6 +255,16 @@ function check(name, cond, extra) {
     requestAnimationFrame(tick);
   }));
   check('renders at a sane frame rate (headless swiftshader CPU-renders at ~1/20th of a real GPU)', perf.fps > 2, `fps=${perf.fps.toFixed(0)} drawCalls=${perf.calls} tris=${perf.tris}`);
+
+  // ---- settings persistence ----
+  const setOk = await page.evaluate(() => {
+    const el = document.getElementById('set-music');
+    el.value = 25;
+    el.dispatchEvent(new Event('input'));
+    return JSON.parse(localStorage.getItem('ah_settings') || '{}').music === 25 &&
+      document.querySelectorAll('.edge-arrow').length === 8;
+  });
+  check('settings persist and edge arrows exist', setOk);
 
   check('no JS errors during entire run', errors.length === 0, errors.slice(0, 5).join(' | '));
 

@@ -119,6 +119,32 @@
   /* popups */
   .popup { position: fixed; z-index: 18; pointer-events: none; font-weight: 800; font-size: 15px; color: var(--gold);
     text-shadow: 0 0 8px rgba(0,0,0,.8); transition: transform .7s ease-out, opacity .7s ease-out; }
+  .popup.crit { font-size: 19px; color: #ffd34d; text-shadow: 0 0 14px rgba(255,180,40,.9); }
+  .popup.dmg { font-size: 13px; color: #cfe4ff; }
+
+  /* screen-edge threat arrows */
+  .edge-arrow {
+    position: fixed; z-index: 17; pointer-events: none; width: 0; height: 0;
+    border-left: 9px solid transparent; border-right: 9px solid transparent;
+    border-bottom: 14px solid rgba(255,120,90,.85); filter: drop-shadow(0 0 6px rgba(255,90,70,.8));
+    display: none;
+  }
+  .edge-arrow.boss { border-bottom-color: #ff3d55; transform-origin: center;
+    border-left-width: 13px; border-right-width: 13px; border-bottom-width: 20px; }
+
+  /* cinematic letterbox */
+  .cinebar { position: fixed; left: 0; right: 0; height: 0; background: #000; z-index: 26; transition: height .5s ease; pointer-events: none; }
+  #cine-top { top: 0; } #cine-bot { bottom: 0; }
+  body.cine .cinebar { height: 11vh; }
+
+  /* settings */
+  .settings { margin-top: 26px; width: min(420px, 86vw); text-align: left; }
+  .set-row { display: flex; align-items: center; justify-content: space-between; gap: 14px; padding: 7px 0; }
+  .set-row label { font-size: 12px; letter-spacing: .18em; text-transform: uppercase; color: var(--dim); }
+  .set-row input[type="range"] { width: 180px; accent-color: #4db8ff; }
+  .set-row input[type="checkbox"] { width: 17px; height: 17px; accent-color: #4db8ff; }
+  .rank-line { margin-top: 20px; font-size: 13px; letter-spacing: .14em; color: var(--dim); text-transform: uppercase; }
+  .rank-line b { color: var(--gold); }
 
   /* ---------- touch controls ---------- */
   #touch { position: fixed; inset: 0; z-index: 25; pointer-events: none; display: none; }
@@ -144,6 +170,8 @@
 
 <div id="vignette"></div>
 <div id="tempotint"></div>
+<div class="cinebar" id="cine-top"></div>
+<div class="cinebar" id="cine-bot"></div>
 
 <div id="hud">
   <div id="wave-label">Wave <b id="wave-num">1</b> <span id="wave-left"></span></div>
@@ -200,12 +228,21 @@
     <b>W A S D</b> move &nbsp; <b>Mouse</b> aim &nbsp; <b>Click / F</b> throw pen &nbsp; <b>E</b> briefcase swing &nbsp; <b>R</b> ultimate<br>
     <b>Space</b> jump &nbsp; <b>Shift</b> dash &nbsp; <b>Q / Right-click</b> hold to slow time &nbsp; <b>M</b> mute &nbsp; <b>P</b> pause
   </div>
+  <div class="rank-line" id="rank-line"></div>
   <div class="fineprint">RUNS ENTIRELY IN YOUR BROWSER · BUILT WITH THREE.JS</div>
 </div>
 
 <div class="overlay hidden" id="pause">
   <div class="kicker">On Hold</div>
   <h1 class="title" style="font-size:clamp(34px,6vw,64px)">PAUSED</h1>
+  <div class="settings">
+    <div class="set-row"><label>Music</label><input type="range" id="set-music" min="0" max="100" value="50"></div>
+    <div class="set-row"><label>Effects</label><input type="range" id="set-sfx" min="0" max="100" value="90"></div>
+    <div class="set-row"><label>Mouse speed</label><input type="range" id="set-sens" min="20" max="200" value="100"></div>
+    <div class="set-row"><label>Invert Y</label><input type="checkbox" id="set-inverty"></div>
+    <div class="set-row"><label>Bloom</label><input type="checkbox" id="set-bloom" checked></div>
+    <div class="set-row"><label>Rain</label><input type="checkbox" id="set-rain" checked></div>
+  </div>
   <button class="btn" id="btn-resume">Resume</button>
   <button class="btn secondary" id="btn-restart-p">Restart</button>
 </div>
@@ -280,6 +317,11 @@
     partner: { ehp: 1, edmg: 1 },
     senior: { ehp: 1.35, edmg: 1.4 },
   };
+  const RANKS = [
+    ['Intern', 0], ['Analyst', 5000], ['Associate', 15000], ['Senior Associate', 35000],
+    ['Vice President', 70000], ['Director', 120000], ['Senior Partner', 200000],
+    ['Managing Partner', 350000], ['Name On The Door', 600000],
+  ];
   const PERKS = [
     { id: 'triple', name: 'Triple Threat', tag: 'Pens', desc: 'Throw a 3-pen spread. Side pens deal 60% damage.' },
     { id: 'pierce', name: 'Fine Print', tag: 'Pens', desc: 'Pens pierce through up to 2 extra machines.' },
@@ -295,7 +337,8 @@
   // ================================================================ AUDIO ==
   const Audio = (() => {
     let ctx = null, master, sfxGain, musGain, musFilter, muted = false, started = false;
-    let step = 0, nextT = 0, timer = null;
+    let step = 0, nextT = 0, timer = null, intense = false;
+    let volMus = 0.5, volSfx = 0.9;
     const BPM = 100, SPB = 60 / BPM / 4; // 16th note
 
     // A minor synthwave: Am | F | C | G
@@ -309,11 +352,17 @@
       if (ctx) return;
       try { ctx = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) { return; }
       master = ctx.createGain(); master.gain.value = 0.55; master.connect(ctx.destination);
-      sfxGain = ctx.createGain(); sfxGain.gain.value = 0.9; sfxGain.connect(master);
+      sfxGain = ctx.createGain(); sfxGain.gain.value = volSfx; sfxGain.connect(master);
       musFilter = ctx.createBiquadFilter(); musFilter.type = 'lowpass'; musFilter.frequency.value = 9000;
-      musGain = ctx.createGain(); musGain.gain.value = 0.5;
+      musGain = ctx.createGain(); musGain.gain.value = volMus;
       musGain.connect(musFilter); musFilter.connect(master);
     }
+    function setVolumes(mus, sfx) {
+      volMus = mus; volSfx = sfx;
+      if (musGain) musGain.gain.value = volMus;
+      if (sfxGain) sfxGain.gain.value = volSfx;
+    }
+    function setIntense(on) { intense = !!on; }
     function startMusic() {
       init(); if (!ctx || started) return; started = true;
       if (ctx.state === 'suspended') ctx.resume();
@@ -346,19 +395,19 @@
     }
     function playStep(s, t) {
       const bar = (s >> 4) % 4, inBar = s % 16;
-      // kick on beats
-      if (inBar % 4 === 0) {
+      // kick on beats — boss phase doubles the drive
+      if (inBar % 4 === 0 || (intense && inBar % 4 === 2)) {
         const o = ctx.createOscillator(), g = ctx.createGain();
         o.frequency.setValueAtTime(120, t); o.frequency.exponentialRampToValueAtTime(40, t + 0.1);
         env(g, t, 0.004, 0.5, 0.14); o.connect(g); g.connect(musGain); o.start(t); o.stop(t + 0.3);
       }
-      // hat on off-8ths
-      if (inBar % 2 === 1) noise(t, 0.03, 0.06, 9000, 'highpass');
-      // bass pulse 8ths
-      if (inBar % 2 === 0) osc('triangle', f(BASS[bar]), t, 0.16, 0.24);
+      // hats — every 16th in boss phase
+      if (inBar % 2 === 1 || intense) noise(t, 0.03, intense ? 0.08 : 0.06, 9000, 'highpass');
+      // bass pulse 8ths, octave up when intense
+      if (inBar % 2 === 0) osc('triangle', f(BASS[bar] + (intense ? 12 : 0)), t, 0.16, 0.24);
       // arp 16ths
       const ch = CHORDS[bar];
-      osc('sawtooth', f(ch[s % 3] + 12), t, 0.07, 0.035);
+      osc('sawtooth', f(ch[s % 3] + 12), t, 0.07, intense ? 0.055 : 0.035);
       // pad at bar start
       if (inBar === 0) for (const n of ch) {
         osc('sawtooth', f(n), t, SPB * 16, 0.028, musGain, -6);
@@ -411,7 +460,7 @@
         [60, 67, 72, 76].forEach((n, i) => osc('sine', f(n), t + i * 0.09, 0.35, 0.18, sfxGain)); },
     };
     function toggleMute() { init(); muted = !muted; if (master) master.gain.value = muted ? 0 : 0.55; return muted; }
-    return { init, startMusic, sfx, toggleMute, get ctx() { return ctx; } };
+    return { init, startMusic, sfx, toggleMute, setVolumes, setIntense, get ctx() { return ctx; } };
   })();
 
   // ============================================================= RENDERER ==
@@ -979,11 +1028,13 @@
     if (e.code === 'KeyP' || (e.code === 'Escape' && game.mode === 'paused')) togglePause();
     if (e.code === 'KeyE') tryMelee();
     if (e.code === 'KeyR') fireUlt();
+    if (game.mode === 'cinematic') game.cineT = Math.min(game.cineT, 0.25);
     if (e.code === 'Space') e.preventDefault();
   });
   document.addEventListener('keyup', (e) => { keys[e.code] = false; });
 
   canvas.addEventListener('mousedown', (e) => {
+    if (game.mode === 'cinematic') { game.cineT = Math.min(game.cineT, 0.25); return; }
     if (game.mode !== 'playing') return;
     if (e.button === 0) mouseDown = true;
     if (e.button === 2) rmbDown = true;
@@ -996,10 +1047,62 @@
   window.addEventListener('contextmenu', (e) => e.preventDefault());
   document.addEventListener('mousemove', (e) => {
     if (document.pointerLockElement === canvas && game.mode === 'playing') {
-      camYaw -= e.movementX * 0.0023;
-      camPitch = clamp(camPitch + e.movementY * 0.0021, -0.25, 1.05);
+      const s = SETTINGS.sens / 100;
+      camYaw -= e.movementX * 0.0023 * s;
+      camPitch = clamp(camPitch + e.movementY * 0.0021 * s * (SETTINGS.invertY ? -1 : 1), -0.25, 1.05);
     }
   });
+
+  // -------------------------------------------------------------- settings --
+  const SETTINGS = Object.assign(
+    { music: 50, sfx: 90, sens: 100, invertY: false, bloom: true, rain: true },
+    JSON.parse(localStorage.getItem('ah_settings') || '{}')
+  );
+  function applySettings() {
+    Audio.setVolumes(SETTINGS.music / 100, SETTINGS.sfx / 100);
+    FX.bloom = SETTINGS.bloom;
+    FX.rain = SETTINGS.rain;
+  }
+  function saveSettings() { localStorage.setItem('ah_settings', JSON.stringify(SETTINGS)); }
+  (function wireSettings() {
+    const bindRange = (id, key) => {
+      const el = $(id); el.value = SETTINGS[key];
+      el.addEventListener('input', () => { SETTINGS[key] = +el.value; applySettings(); saveSettings(); });
+    };
+    const bindCheck = (id, key) => {
+      const el = $(id); el.checked = SETTINGS[key];
+      el.addEventListener('change', () => { SETTINGS[key] = el.checked; applySettings(); saveSettings(); });
+    };
+    bindRange('set-music', 'music'); bindRange('set-sfx', 'sfx'); bindRange('set-sens', 'sens');
+    bindCheck('set-inverty', 'invertY'); bindCheck('set-bloom', 'bloom'); bindCheck('set-rain', 'rain');
+    applySettings();
+  })();
+
+  // -------------------------------------------------------- career ladder --
+  let careerXp = +(localStorage.getItem('ah_xp') || 0);
+  function rankIdx(xp) {
+    let i = 0;
+    while (i + 1 < RANKS.length && xp >= RANKS[i + 1][1]) i++;
+    return i;
+  }
+  function rankLineHtml() {
+    const i = rankIdx(careerXp);
+    const next = RANKS[i + 1];
+    return `Career: <b>${RANKS[i][0]}</b> · ${careerXp.toLocaleString()} lifetime billings` +
+      (next ? ` · next promotion at ${next[1].toLocaleString()}` : ' · top of the letterhead');
+  }
+  function updateRankLine() { $('rank-line').innerHTML = rankLineHtml(); }
+  function bankScore() {
+    const delta = game.score - game.bankedScore;
+    if (delta <= 0) return null;
+    const before = rankIdx(careerXp);
+    careerXp += delta;
+    localStorage.setItem('ah_xp', String(careerXp));
+    game.bankedScore = game.score;
+    updateRankLine();
+    const after = rankIdx(careerXp);
+    return after > before ? RANKS[after][0] : null;
+  }
   document.addEventListener('pointerlockchange', () => {
     if (document.pointerLockElement !== canvas && game.mode === 'playing' && !IS_TOUCH) togglePause(true);
   });
@@ -1094,6 +1197,17 @@
   };
 
   // pen pool
+  // min distance² from point p to segment ab (dedicated scratch vectors — the
+  // shared _v* set is live in the collision loops that call this)
+  const _s1 = new THREE.Vector3(), _s2 = new THREE.Vector3(), _s3 = new THREE.Vector3();
+  function segDistSq(a, b, p) {
+    _s1.subVectors(b, a);
+    const len = _s1.lengthSq();
+    const t = len > 0 ? clamp(_s2.subVectors(p, a).dot(_s1) / len, 0, 1) : 0;
+    _s3.copy(a).addScaledVector(_s1, t);
+    return _s3.distanceToSquared(p);
+  }
+
   function makePen() {
     const g = new THREE.Group();
     const b = new THREE.Mesh(GEO.penBody, M.penBody); b.rotation.x = Math.PI / 2; g.add(b);
@@ -1106,7 +1220,7 @@
     );
     trail.position.z = -0.85; trail.rotation.x = 0; g.add(trail);
     g.visible = false; scene.add(g);
-    return { mesh: g, vel: V3(), life: 0, active: false, dmg: 0 };
+    return { mesh: g, vel: V3(), prev: V3(), life: 0, active: false, dmg: 0 };
   }
   for (let i = 0; i < 64; i++) pens.push(makePen());
 
@@ -1123,6 +1237,7 @@
     _v1.set(_v4.z, 0, -_v4.x).multiplyScalar(0.25);
     p.mesh.position.add(_v1);
     p.vel.copy(_v4).multiplyScalar(CFG.player.penSpeed);
+    p.prev.copy(p.mesh.position);
     p.mesh.lookAt(_v1.copy(p.mesh.position).add(_v4));
     flash(p.mesh.position, 0.75, 0x9fdcff);
     Audio.sfx.pen();
@@ -1151,6 +1266,8 @@
     ui.tempotint.style.opacity = '1';
     setTimeout(() => { if (!game.tempoActive) ui.tempotint.style.opacity = '0'; }, 260);
     burst(_v1.copy(player.pos).setY(1.2), 0xffe9a8, 0.4, 26);
+    game.shake = Math.max(game.shake, 0.5);
+    game.hitstopT = Math.max(game.hitstopT, 0.09);
   }
 
   // ---- particle bursts (pooled) ----
@@ -1317,6 +1434,7 @@
     m.position.set(x, 0.25, z);
     scene.add(m);
     slamRings.push({ m, x, z, r: 1, hit: false });
+    game.shake = Math.max(game.shake, 0.18);
     Audio.sfx.tick();
   }
   function updateSlamRings(dt) {
@@ -1377,6 +1495,22 @@
     else if (kind === 'boss') e = makeBoss();
     const dm = DIFF[game.diff] || DIFF.partner;
     e.hp = Math.round(e.hp * dm.ehp); e.maxHp = e.hp;
+    e.baseScale = 1;
+    // overtime elites: bigger, meaner, worth triple
+    if (game.overtime && kind !== 'boss' && Math.random() < 0.15) {
+      e.elite = true;
+      e.baseScale = 1.3;
+      e.mesh.scale.setScalar(1.3);
+      e.hp = e.maxHp = Math.round(e.hp * 2.5);
+      e.score *= 3;
+      e.r *= 1.3;
+      e.mesh.traverse((o) => {
+        if (o.isMesh && o.material && o.material.color) {
+          o.material = o.material.clone();
+          o.material.color.lerp(new THREE.Color(0xff3040), 0.35);
+        }
+      });
+    }
     if (x === undefined) {
       const a = rand(0, TAU), r = CFG.arenaR * rand(0.7, 0.95);
       x = Math.cos(a) * r; z = Math.sin(a) * r;
@@ -1385,7 +1519,17 @@
     scene.add(e.mesh);
     enemies.push(e);
     spawnBeam(x, z, kind === 'boss' ? 0xff3d55 : 0x4db8ff);
-    if (kind === 'boss') { boss = e; $('bosswrap').classList.add('on'); Audio.sfx.alarm(); }
+    if (kind === 'boss') {
+      boss = e;
+      $('bosswrap').classList.add('on');
+      Audio.sfx.alarm();
+      Audio.setIntense(true);
+      if (game.mode === 'playing' && !game.overtime) {
+        game.cineT = 2.8;
+        game.mode = 'cinematic';
+        document.body.classList.add('cine');
+      }
+    }
     return e;
   }
 
@@ -1448,23 +1592,62 @@
     clearTimeout(announceT);
     announceT = setTimeout(() => ui.announce.classList.remove('show'), ms || 2200);
   }
-  function scorePopup(worldPos, text) {
+  let popupN = 0;
+  function worldPopup(worldPos, text, cls) {
+    if (popupN > 14) return;
     _v1.copy(worldPos).project(camera);
     if (_v1.z > 1) return;
+    popupN++;
     const el = document.createElement('div');
-    el.className = 'popup'; el.textContent = text;
+    el.className = 'popup' + (cls ? ' ' + cls : '');
+    el.textContent = text;
     el.style.left = ((_v1.x * 0.5 + 0.5) * innerWidth) + 'px';
     el.style.top = ((-_v1.y * 0.5 + 0.5) * innerHeight) + 'px';
     document.body.appendChild(el);
     requestAnimationFrame(() => { el.style.transform = 'translateY(-46px)'; el.style.opacity = '0'; });
-    setTimeout(() => el.remove(), 750);
+    setTimeout(() => { el.remove(); popupN--; }, 750);
   }
+  function scorePopup(worldPos, text) { worldPopup(worldPos, text); }
+
+  // screen-edge threat arrows
+  const edgePool = [];
+  for (let i = 0; i < 8; i++) {
+    const d = document.createElement('div');
+    d.className = 'edge-arrow';
+    document.body.appendChild(d);
+    edgePool.push(d);
+  }
+  function updateEdgeArrows() {
+    let used = 0;
+    const list = boss ? [boss, ...enemies.filter((e) => e !== boss)] : enemies;
+    for (const e of list) {
+      if (used >= edgePool.length) break;
+      _v1.copy(e.mesh.position).project(camera);
+      const behind = _v1.z > 1;
+      if (!behind && Math.abs(_v1.x) < 0.92 && Math.abs(_v1.y) < 0.92) continue;
+      let x = _v1.x, y = _v1.y;
+      if (behind) { x = -x; y = -y; }
+      const m = Math.max(Math.abs(x), Math.abs(y), 0.0001);
+      x = x / m * 0.9; y = y / m * 0.88;
+      const sx = (x * 0.5 + 0.5) * innerWidth, sy = (-y * 0.5 + 0.5) * innerHeight;
+      const ang = Math.atan2(sy - innerHeight / 2, sx - innerWidth / 2) * 180 / Math.PI + 90;
+      const d = edgePool[used++];
+      d.style.display = 'block';
+      d.classList.toggle('boss', e.kind === 'boss');
+      d.style.left = (sx - 11) + 'px';
+      d.style.top = (sy - 10) + 'px';
+      d.style.transform = `rotate(${ang}deg)`;
+    }
+    for (let i = used; i < edgePool.length; i++) edgePool[i].style.display = 'none';
+  }
+  function hideEdgeArrows() { for (const d of edgePool) d.style.display = 'none'; }
 
   // ================================================================= GAME ==
   const game = {
     mode: 'title', // title | playing | paused | gameover | victory
     wave: 0, score: 0, kills: 0, combo: 0, comboT: 0,
     tempoMeter: 100, tempoActive: false, ult: 0, diff: 'partner',
+    hitstopT: 0, shake: 0, cineT: 0, dieT: 0, bankedScore: 0,
     time: 0, spawnQueue: [], spawnT: 0, betweenT: 0,
     overtime: false, otLevel: 0,
     best: +(localStorage.getItem('ah_best') || 0),
@@ -1493,6 +1676,9 @@
     game.wave = 0; game.score = 0; game.kills = 0; game.combo = 0; game.comboT = 0;
     game.tempoMeter = 100; game.tempoActive = false; game.time = 0; game.ult = 0;
     game.spawnQueue = []; game.betweenT = 0; game.overtime = false; game.otLevel = 0;
+    game.hitstopT = 0; game.shake = 0; game.cineT = 0; game.dieT = 0; game.bankedScore = 0;
+    Audio.setIntense(false);
+    document.body.classList.remove('cine');
     camYaw = Math.PI; camPitch = 0.32;
     updateHud(true);
   }
@@ -1600,6 +1786,9 @@
     e.dead = true;
     game.kills++;
     game.combo++; game.comboT = 4;
+    game.hitstopT = Math.max(game.hitstopT, e.kind === 'boss' ? 0.35 : 0.05);
+    if (e.kind === 'boss') game.shake = Math.max(game.shake, 0.8);
+    if (e.elite) game.shake = Math.max(game.shake, 0.3);
     game.ult = Math.min(100, game.ult + CFG.ult.perKill);
     if (player.perks.has('vampire')) player.hp = Math.min(player.maxHp, player.hp + 3);
     if (game.combo === 5) { game.tempoMeter = Math.min(100, game.tempoMeter + 30); showAnnounce('ON A ROLL', '+30 TEMPO', 1000); }
@@ -1615,6 +1804,7 @@
     const i = enemies.indexOf(e); if (i >= 0) enemies.splice(i, 1);
     if (e.kind === 'boss') {
       boss = null; ui.bosswrap.classList.remove('on');
+      Audio.setIntense(false);
       if (!game.overtime) return void winGame();
     }
   }
@@ -1631,6 +1821,7 @@
     player.sinceHurt = 0;
     player.iframes = 0.5;
     game.combo = 0;
+    game.shake = Math.max(game.shake, 0.25);
     Audio.sfx.hurt();
     ui.vignette.style.opacity = '1';
     setTimeout(() => { if (player.hp > 25) ui.vignette.style.opacity = '0'; }, 220);
@@ -1649,6 +1840,7 @@
       const d = _v1.length();
       if (d < meleeR + e.r) {
         damageEnemy(e, dmg, e.mesh.position);
+        game.shake = Math.max(game.shake, 0.13);
         // knockback
         _v1.normalize().multiplyScalar(9);
         e.vel.add(_v1);
@@ -1661,28 +1853,49 @@
     }
   }
 
+  function careerHtml(promo) {
+    return `<br>${rankLineHtml()}` +
+      (promo ? `<br><span class="v">★ PROMOTED TO ${promo.toUpperCase()} ★</span>` : '');
+  }
   function winGame() {
     game.mode = 'victory';
     document.exitPointerLock && document.exitPointerLock();
+    document.body.classList.remove('cine');
+    hideEdgeArrows();
+    const promo = bankScore();
     const t = Math.round(game.time);
     if (game.score > game.best) { game.best = game.score; localStorage.setItem('ah_best', game.best); }
     $('vic-stats').innerHTML =
       `Final score <span class="v">${game.score}</span> · Best <span class="v">${game.best}</span><br>` +
-      `Machines dismantled <span class="v">${game.kills}</span> · Time on the clock <span class="v">${Math.floor(t / 60)}:${String(t % 60).padStart(2, '0')}</span>`;
+      `Machines dismantled <span class="v">${game.kills}</span> · Time on the clock <span class="v">${Math.floor(t / 60)}:${String(t % 60).padStart(2, '0')}</span>` +
+      careerHtml(promo);
     $('victory').classList.remove('hidden');
     ui.hud.classList.remove('on');
     Audio.sfx.fanfare();
   }
   function loseGame() {
+    if (!player.alive) return;
     player.alive = false;
+    game.mode = 'dying';
+    game.dieT = 1.5;
+    game.shake = Math.max(game.shake, 0.4);
+    document.body.classList.add('cine');
+    hideEdgeArrows();
+    Audio.sfx.die();
+    Audio.setIntense(false);
+  }
+  function finishGameOver() {
     game.mode = 'gameover';
     document.exitPointerLock && document.exitPointerLock();
+    document.body.classList.remove('cine');
+    const promo = bankScore();
     if (game.score > game.best) { game.best = game.score; localStorage.setItem('ah_best', game.best); }
     const t = Math.round(game.time);
     $('go-stats').innerHTML =
       `Score <span class="v">${game.score}</span> · Best <span class="v">${game.best}</span><br>` +
       `Waves survived <span class="v">${Math.max(0, game.wave - 1)}</span> · Machines dismantled <span class="v">${game.kills}</span> · ` +
-      `Time <span class="v">${Math.floor(t / 60)}:${String(t % 60).padStart(2, '0')}</span>`;
+      `Time <span class="v">${Math.floor(t / 60)}:${String(t % 60).padStart(2, '0')}</span>` +
+      careerHtml(promo);
     $('gameover').classList.remove('hidden');
     ui.hud.classList.remove('on');
   }
@@ -1691,6 +1904,7 @@
     if (game.mode === 'playing') {
       game.mode = 'paused';
       $('pause').classList.remove('hidden');
+      hideEdgeArrows();
       document.exitPointerLock && document.exitPointerLock();
     } else if (game.mode === 'paused' && !force) {
       $('pause').classList.add('hidden');
@@ -2049,7 +2263,7 @@
       // hit pop
       if (e.popT > 0) {
         e.popT = Math.max(0, e.popT - dt);
-        e.mesh.scale.setScalar(1 + 0.16 * (e.popT / 0.15));
+        e.mesh.scale.setScalar((e.baseScale || 1) * (1 + 0.16 * (e.popT / 0.15)));
       }
 
       // clamp to arena
@@ -2137,6 +2351,7 @@
     for (const p of pens) {
       if (!p.active) continue;
       p.life -= playerDt;
+      p.prev.copy(p.mesh.position);
       p.mesh.position.addScaledVector(p.vel, playerDt);
       p.mesh.rotateZ(playerDt * 14);
       let stop = false;
@@ -2144,9 +2359,20 @@
         if (e === p.lastHit) continue;
         const hitR = e.r + 0.25;
         const ep = e.kind === 'drone' || e.kind === 'boss' ? e.mesh.position : _v2.copy(e.mesh.position).setY(1.1);
-        if (p.mesh.position.distanceToSquared(ep) < hitR * hitR ||
-            (e.kind === 'walker' && p.mesh.position.distanceToSquared(_v3.copy(e.mesh.position).setY(1.9)) < 0.6)) {
-          damageEnemy(e, p.dmg, p.mesh.position);
+        // swept test — fast pens cover several metres per frame and would tunnel
+        if (segDistSq(p.prev, p.mesh.position, ep) < hitR * hitR ||
+            (e.kind === 'walker' && segDistSq(p.prev, p.mesh.position, _v3.copy(e.mesh.position).setY(1.9)) < 0.6)) {
+          let d = p.dmg;
+          const crit = Math.random() < 0.12;
+          if (crit) {
+            d *= 2.2;
+            flash(p.mesh.position, 1.8, 0xffd34d);
+            worldPopup(p.mesh.position, 'CRIT ' + Math.round(d), 'crit');
+            Audio.sfx.tick();
+          } else if (Math.random() < 0.35) {
+            worldPopup(p.mesh.position, String(Math.round(d)), 'dmg');
+          }
+          damageEnemy(e, d, p.mesh.position);
           p.lastHit = e;
           if (p.pierce > 0) p.pierce--; else stop = true;
           break;
@@ -2161,11 +2387,13 @@
       const h = hazards[i];
       h.life -= dt;
       h.vel.y -= h.grav * dt;
+      _v4.copy(h.mesh.position);
       h.mesh.position.addScaledVector(h.vel, dt);
       if (h.kind === 'wad') h.mesh.rotation.x += dt * 8;
-      // hit player
+      // hit player (swept — shards are fast)
       _v1.copy(player.pos); _v1.y += 1.0;
-      if (h.mesh.position.distanceTo(_v1) < h.r + 0.55) {
+      const hr = h.r + 0.55;
+      if (segDistSq(_v4, h.mesh.position, _v1) < hr * hr) {
         hurtPlayer(h.dmg);
         burst(h.mesh.position, 0xff8095, 0.16, 10);
         h.life = 0;
@@ -2263,6 +2491,13 @@
     const targetFov = game.tempoActive ? 56 : player.dashT > 0 ? 68 : 62;
     camera.fov = lerp(camera.fov, targetFov, 0.12);
     camera.updateProjectionMatrix();
+    // impact shake
+    if (game.shake > 0.001) {
+      camera.position.x += (Math.random() - 0.5) * game.shake;
+      camera.position.y += (Math.random() - 0.5) * game.shake * 0.6;
+      camera.position.z += (Math.random() - 0.5) * game.shake;
+      game.shake *= Math.max(0, 1 - 6 * rawDt);
+    } else game.shake = 0;
   }
 
   function updateDirector(dt) {
@@ -2321,8 +2556,9 @@
       }
 
       const ts = game.tempoActive ? CFG.tempo.scale : 1;
-      const worldDt = rawDt * ts;
-      const playerDt = rawDt * (game.tempoActive ? CFG.tempo.playerScale : 1);
+      let worldDt = rawDt * ts;
+      let playerDt = rawDt * (game.tempoActive ? CFG.tempo.playerScale : 1);
+      if (game.hitstopT > 0) { game.hitstopT -= rawDt; worldDt *= 0.06; playerDt *= 0.06; }
       game.time += rawDt;
 
       updatePlayer(playerDt, rawDt);
@@ -2332,7 +2568,39 @@
       updateDirector(worldDt);
       updateFx(rawDt * (ts === 1 ? 1 : 0.55));
       updateHud();
+      updateEdgeArrows();
       autoQuality(rawDt);
+    } else if (game.mode === 'cinematic') {
+      // boss introduction: letterboxed dolly toward The Deadline
+      game.cineT -= rawDt;
+      if (boss) {
+        _v1.copy(player.pos).sub(boss.mesh.position).setY(0).normalize();
+        _v2.set(
+          boss.mesh.position.x + _v1.x * 11.5,
+          boss.mesh.position.y + 2.4,
+          boss.mesh.position.z + _v1.z * 11.5
+        );
+        camera.position.lerp(_v2, 1 - Math.pow(0.001, rawDt));
+        camera.lookAt(boss.mesh.position);
+        boss.t += rawDt;
+        boss.hourHand.rotation.z = -boss.t * 0.35;
+        boss.minHand.rotation.z = -boss.t * 1.7;
+        boss.glow.intensity = 1.2 + Math.sin(boss.t * 6) * 0.5;
+      }
+      updateFx(rawDt * 0.4);
+      if (game.cineT <= 0 || !boss) {
+        game.mode = 'playing';
+        document.body.classList.remove('cine');
+      }
+    } else if (game.mode === 'dying') {
+      // slow collapse + orbiting camera before the terminated screen
+      game.dieT -= rawDt;
+      heroRig.body.rotation.x = lerp(heroRig.body.rotation.x, -1.5, 1 - Math.pow(0.02, rawDt));
+      camYaw += rawDt * 0.6;
+      camPitch = Math.min(1.0, camPitch + rawDt * 0.35);
+      updateFx(rawDt * 0.25);
+      updateHud();
+      if (game.dieT <= 0) finishGameOver();
     } else {
       // idle scene motion on menus
       updateFx(rawDt * 0.6);
@@ -2343,12 +2611,13 @@
       }
     }
     updateAmbient(rawDt);
-    if (game.mode !== 'title' && game.mode !== 'lookdev') updateCamera(rawDt);
+    if (game.mode !== 'title' && game.mode !== 'lookdev' && game.mode !== 'cinematic') updateCamera(rawDt);
     if (FX.bloom) composer.render(); else renderer.render(scene, camera);
   }
 
   // idle hero pose on title screen
   heroRig.root.position.set(0, 0, 6);
+  updateRankLine();
   frame();
 
   // =========================================================== TEST HOOKS ==
@@ -2364,6 +2633,7 @@
         mode: game.mode, wave: game.wave, score: game.score, kills: game.kills,
         hp: player.hp, maxHp: player.maxHp, shield: player.shield, tempo: game.tempoMeter,
         ult: game.ult, perks: [...player.perks], diff: game.diff, rings: slamRings.length,
+        xp: careerXp, rank: RANKS[rankIdx(careerXp)][0], shake: +game.shake.toFixed(3),
         enemies: enemies.length, queued: game.spawnQueue.length,
         hazards: hazards.length, pickups: pickups.length,
         playerPos: { x: +player.pos.x.toFixed(2), y: +player.pos.y.toFixed(2), z: +player.pos.z.toFixed(2) },
@@ -2393,6 +2663,8 @@
     setFx(o) { Object.assign(FX, o); },
     setDiff(d) { game.diff = d; },
     slam(x, z) { spawnSlamRing(x || 0, z || 0); },
+    skipCine() { if (game.mode === 'cinematic') game.cineT = 0.01; },
+    settings: SETTINGS,
   };
 })();
 
