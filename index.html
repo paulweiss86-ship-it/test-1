@@ -132,6 +132,8 @@
   }
   .edge-arrow.boss { border-bottom-color: #ff3d55; transform-origin: center;
     border-left-width: 13px; border-right-width: 13px; border-bottom-width: 20px; }
+  .edge-arrow.exit { border-bottom-color: #ffe9a8; filter: drop-shadow(0 0 8px rgba(255,220,130,.9));
+    border-left-width: 13px; border-right-width: 13px; border-bottom-width: 20px; }
 
   /* cinematic letterbox */
   .cinebar { position: fixed; left: 0; right: 0; height: 0; background: #000; z-index: 26; transition: height .5s ease; pointer-events: none; }
@@ -221,8 +223,9 @@
   <h1 class="title">AFTER&nbsp;HOURS</h1>
   <div class="subtitle">Paul Weiss vs. The Deadline</div>
   <p class="tagline">The financial district, 11:58 PM. The office machines have unionized under a corrupted
-    mainframe called <b>THE DEADLINE</b> — and it has scheduled the end of the world for midnight.
-    One consultant stands in its way. Sharp suit. Sharper pens. And a silver watch that can bend time itself.</p>
+    mainframe called <b>THE DEADLINE</b> — and as long as it ticks, nobody ever leaves this city.
+    One consultant has had enough. Sharp suit. Sharper pens. A silver watch that bends time itself.
+    Destroy The Deadline, and the exit opens: <b>tonight, Paul Weiss escapes the rat race for good.</b></p>
   <button class="btn" id="btn-start">Clock In</button>
   <div class="diff-row">
     <button class="diff-btn" data-diff="associate">Associate</button>
@@ -260,12 +263,12 @@
 </div>
 
 <div class="overlay hidden" id="victory">
-  <div class="kicker">Engagement Closed</div>
-  <h1 class="title" style="font-size:clamp(30px,6vw,64px); color:#ffe9a8; text-shadow:0 0 30px rgba(232,193,90,.6)">DEADLINE&nbsp;DEFEATED</h1>
-  <div class="subtitle" style="color:var(--accent)">The city sleeps. Paul clocks out.</div>
+  <div class="kicker">Resignation Accepted</div>
+  <h1 class="title" style="font-size:clamp(30px,6vw,64px); color:#ffe9a8; text-shadow:0 0 30px rgba(232,193,90,.6)">RAT&nbsp;RACE:&nbsp;ESCAPED</h1>
+  <div class="subtitle" style="color:var(--accent)">The Deadline is dust. The exit was real. Paul walks — and doesn't look back.</div>
   <div class="stat-lines" id="vic-stats"></div>
-  <button class="btn" id="btn-overtime">Overtime Mode (Endless)</button>
-  <button class="btn secondary" id="btn-restart-v">Play Again</button>
+  <button class="btn" id="btn-overtime">Stay in the Grind (Endless)</button>
+  <button class="btn secondary" id="btn-restart-v">Run It Again</button>
 </div>
 
 <script src="vendor/three.min.js"></script>

@@ -132,6 +132,8 @@
   }
   .edge-arrow.boss { border-bottom-color: #ff3d55; transform-origin: center;
     border-left-width: 13px; border-right-width: 13px; border-bottom-width: 20px; }
+  .edge-arrow.exit { border-bottom-color: #ffe9a8; filter: drop-shadow(0 0 8px rgba(255,220,130,.9));
+    border-left-width: 13px; border-right-width: 13px; border-bottom-width: 20px; }
 
   /* cinematic letterbox */
   .cinebar { position: fixed; left: 0; right: 0; height: 0; background: #000; z-index: 26; transition: height .5s ease; pointer-events: none; }
@@ -221,8 +223,9 @@
   <h1 class="title">AFTER&nbsp;HOURS</h1>
   <div class="subtitle">Paul Weiss vs. The Deadline</div>
   <p class="tagline">The financial district, 11:58 PM. The office machines have unionized under a corrupted
-    mainframe called <b>THE DEADLINE</b> — and it has scheduled the end of the world for midnight.
-    One consultant stands in its way. Sharp suit. Sharper pens. And a silver watch that can bend time itself.</p>
+    mainframe called <b>THE DEADLINE</b> — and as long as it ticks, nobody ever leaves this city.
+    One consultant has had enough. Sharp suit. Sharper pens. A silver watch that bends time itself.
+    Destroy The Deadline, and the exit opens: <b>tonight, Paul Weiss escapes the rat race for good.</b></p>
   <button class="btn" id="btn-start">Clock In</button>
   <div class="diff-row">
     <button class="diff-btn" data-diff="associate">Associate</button>
@@ -260,12 +263,12 @@
 </div>
 
 <div class="overlay hidden" id="victory">
-  <div class="kicker">Engagement Closed</div>
-  <h1 class="title" style="font-size:clamp(30px,6vw,64px); color:#ffe9a8; text-shadow:0 0 30px rgba(232,193,90,.6)">DEADLINE&nbsp;DEFEATED</h1>
-  <div class="subtitle" style="color:var(--accent)">The city sleeps. Paul clocks out.</div>
+  <div class="kicker">Resignation Accepted</div>
+  <h1 class="title" style="font-size:clamp(30px,6vw,64px); color:#ffe9a8; text-shadow:0 0 30px rgba(232,193,90,.6)">RAT&nbsp;RACE:&nbsp;ESCAPED</h1>
+  <div class="subtitle" style="color:var(--accent)">The Deadline is dust. The exit was real. Paul walks — and doesn't look back.</div>
   <div class="stat-lines" id="vic-stats"></div>
-  <button class="btn" id="btn-overtime">Overtime Mode (Endless)</button>
-  <button class="btn secondary" id="btn-restart-v">Play Again</button>
+  <button class="btn" id="btn-overtime">Stay in the Grind (Endless)</button>
+  <button class="btn secondary" id="btn-restart-v">Run It Again</button>
 </div>
 
 <script>
@@ -1626,7 +1629,8 @@
   });
 
   // --------------------------------------------------------------- lights --
-  scene.add(new THREE.HemisphereLight(0x2c3a5c, 0x07080e, 0.55));
+  const hemi = new THREE.HemisphereLight(0x2c3a5c, 0x07080e, 0.55);
+  scene.add(hemi);
   const moon = new THREE.DirectionalLight(0xbdd4ff, 1.2);
   moon.position.set(-40, 70, -30);
   moon.castShadow = true;
@@ -1717,6 +1721,28 @@
 
   // ================================================================ WORLD ==
   const world = new THREE.Group(); scene.add(world);
+
+  // static circle colliders (planters, lamps, vents, exit posts) — resolved on
+  // the XZ plane for the player and ground enemies so nothing clips through props
+  const colliders = [];
+  function collideXZ(pos, radius) {
+    let hit = false;
+    for (const c of colliders) {
+      const dx = pos.x - c.x, dz = pos.z - c.z;
+      const rr = radius + c.r;
+      const d2 = dx * dx + dz * dz;
+      if (d2 >= rr * rr) continue;
+      hit = true;
+      if (d2 > 1e-6) {
+        const d = Math.sqrt(d2);
+        pos.x = c.x + dx / d * rr;
+        pos.z = c.z + dz / d * rr;
+      } else {
+        pos.x = c.x + rr;
+      }
+    }
+    return hit;
+  }
 
   // sky dome — deep night zenith into light-pollution horizon glow
   {
@@ -1875,6 +1901,7 @@
     if (i % 2 === 0) { const pl = new THREE.PointLight(0xffd9a0, 0.55, 22, 1.6); pl.position.y = 5.4; g.add(pl); }
     g.position.set(Math.cos(a) * r, 0, Math.sin(a) * r);
     world.add(g);
+    colliders.push({ x: g.position.x, z: g.position.z, r: 0.3 });
   }
 
   // planters (decor)
@@ -1888,6 +1915,7 @@
     const b = new THREE.Mesh(bushGeo, bushMat); b.position.set(p.position.x, 1.35, p.position.z); b.scale.y = 0.75;
     p.castShadow = b.castShadow = true;
     world.add(p); world.add(b);
+    colliders.push({ x: p.position.x, z: p.position.z, r: 1.6 });
   }
 
   // stars
@@ -1988,6 +2016,7 @@
         new THREE.MeshStandardMaterial({ color: 0x232a3c, roughness: 0.8, metalness: 0.4 })
       );
       grate.position.set(ox, 0.06, oz); world.add(grate);
+      colliders.push({ x: ox, z: oz, r: 0.85 });
       steamVents.push({ pts, pos, seed, n, ox, oz, t: rand(0, 9) });
     }
   }
@@ -2017,6 +2046,24 @@
       }
       g.attributes.position.needsUpdate = true;
     } };
+  })();
+
+  // dawn rig — hidden until the escape: a rising sun beyond the exit, warm key
+  // light and a fog shift from midnight blue to first light
+  const dawn = (() => {
+    const tex = canvasTex(128, 128, (g, w, h) => {
+      const gr = g.createRadialGradient(64, 64, 6, 64, 64, 64);
+      gr.addColorStop(0, 'rgba(255,244,214,1)');
+      gr.addColorStop(0.3, 'rgba(255,206,130,0.95)');
+      gr.addColorStop(0.7, 'rgba(255,150,90,0.4)');
+      gr.addColorStop(1, 'rgba(255,140,80,0)');
+      g.fillStyle = gr; g.fillRect(0, 0, w, h);
+    });
+    const sun = new THREE.Sprite(new THREE.SpriteMaterial({ map: tex, transparent: true, opacity: 0, depthWrite: false, depthTest: false }));
+    sun.position.set(0, 6, -82); sun.scale.setScalar(30); sun.renderOrder = 999; scene.add(sun);
+    const light = new THREE.DirectionalLight(0xffc37a, 0);
+    light.position.set(0, 24, -90); scene.add(light);
+    return { sun, light, fogFrom: new THREE.Color(0x0a0e1c), fogTo: new THREE.Color(0x55384a) };
   })();
 
   // ================================================================= HERO ==
@@ -2171,6 +2218,7 @@
     if (e.code === 'KeyE') tryMelee();
     if (e.code === 'KeyR') fireUlt();
     if (game.mode === 'cinematic') game.cineT = Math.min(game.cineT, 0.25);
+    if (game.mode === 'escape') game.escapeT = Math.min(game.escapeT, 0.3);
     if (e.code === 'Space') e.preventDefault();
   });
   document.addEventListener('keyup', (e) => { keys[e.code] = false; });
@@ -2593,6 +2641,65 @@
     }
   }
 
+  // ---- THE EXIT — the way out of the rat race, revealed when the boss falls ----
+  let exit = null;
+  function openExit() {
+    const g = new THREE.Group();
+    const gold = new THREE.MeshStandardMaterial({ color: 0xc9a44a, roughness: 0.3, metalness: 0.9, emissive: 0x6b4d12, emissiveIntensity: 0.5 });
+    const postGeo = new THREE.BoxGeometry(0.45, 5.2, 0.45);
+    const postL = new THREE.Mesh(postGeo, gold); postL.position.set(-1.6, 2.6, 0); postL.castShadow = true; g.add(postL);
+    const postR = postL.clone(); postR.position.x = 1.6; g.add(postR);
+    const lintel = new THREE.Mesh(new THREE.BoxGeometry(3.65, 0.45, 0.45), gold);
+    lintel.position.y = 5.0; g.add(lintel);
+    const sign = new THREE.Mesh(
+      new THREE.PlaneGeometry(3.4, 0.85),
+      new THREE.MeshBasicMaterial({ map: signTex('EXIT →', '#7ff0b8'), transparent: false })
+    );
+    sign.position.set(0, 5.85, 0.1); g.add(sign);
+    const portalMat = new THREE.MeshBasicMaterial({
+      map: canvasTex(64, 128, (gg, w, h) => {
+        const gr = gg.createLinearGradient(0, 0, 0, h);
+        gr.addColorStop(0, 'rgba(255,236,180,0.95)');
+        gr.addColorStop(0.6, 'rgba(255,204,110,0.8)');
+        gr.addColorStop(1, 'rgba(255,170,80,0.55)');
+        gg.fillStyle = gr; gg.fillRect(0, 0, w, h);
+      }),
+      transparent: true, opacity: 0.85, blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.DoubleSide,
+    });
+    const portal = new THREE.Mesh(new THREE.PlaneGeometry(2.75, 4.9), portalMat);
+    portal.position.y = 2.55; g.add(portal);
+    const glow = new THREE.PointLight(0xffd98a, 1.7, 34, 1.6);
+    glow.position.set(0, 3, 1.5); g.add(glow);
+    g.position.set(0, 0, -50);
+    scene.add(g);
+    const cols = [{ x: -1.6, z: -50, r: 0.55 }, { x: 1.6, z: -50, r: 0.55 }];
+    colliders.push(...cols);
+    exit = { g, cols, portalMat, t: 0 };
+    spawnBeam(0, -50, 0xffd98a);
+    showAnnounce('THE EXIT HAS OPENED', 'LEAVE THE RAT RACE — FOLLOW THE GOLDEN LIGHT', 3800);
+    Audio.sfx.perk();
+    return exit;
+  }
+  function removeExit() {
+    if (!exit) return;
+    scene.remove(exit.g);
+    for (const c of exit.cols) {
+      const i = colliders.indexOf(c);
+      if (i >= 0) colliders.splice(i, 1);
+    }
+    exit = null;
+  }
+  function startEscape() {
+    game.mode = 'escape';
+    game.escapeT = 5.2;
+    document.body.classList.add('cine');
+    ui.hud.classList.remove('on');
+    hideEdgeArrows();
+    for (const h of hazards) h.life = 0;
+    heroRig.briefcase.visible = false;
+    Audio.sfx.fanfare();
+  }
+
   // ---- boss ----
   let boss = null;
   function makeBoss() {
@@ -2761,7 +2868,10 @@
   }
   function updateEdgeArrows() {
     let used = 0;
-    const list = boss ? [boss, ...enemies.filter((e) => e !== boss)] : enemies;
+    const list = [];
+    if (exit) list.push({ mesh: exit.g, kind: 'exit' });
+    if (boss) list.push(boss);
+    for (const e of enemies) if (e !== boss) list.push(e);
     for (const e of list) {
       if (used >= edgePool.length) break;
       _v1.copy(e.mesh.position).project(camera);
@@ -2776,6 +2886,7 @@
       const d = edgePool[used++];
       d.style.display = 'block';
       d.classList.toggle('boss', e.kind === 'boss');
+      d.classList.toggle('exit', e.kind === 'exit');
       d.style.left = (sx - 11) + 'px';
       d.style.top = (sy - 10) + 'px';
       d.style.transform = `rotate(${ang}deg)`;
@@ -2821,6 +2932,11 @@
     game.hitstopT = 0; game.shake = 0; game.cineT = 0; game.dieT = 0; game.bankedScore = 0;
     Audio.setIntense(false);
     document.body.classList.remove('cine');
+    removeExit();
+    dawn.sun.material.opacity = 0;
+    dawn.light.intensity = 0;
+    hemi.intensity = 0.55;
+    scene.fog.color.copy(dawn.fogFrom);
     camYaw = Math.PI; camPitch = 0.32;
     updateHud(true);
   }
@@ -2947,7 +3063,7 @@
     if (e.kind === 'boss') {
       boss = null; ui.bosswrap.classList.remove('on');
       Audio.setIntense(false);
-      if (!game.overtime) return void winGame();
+      if (!game.overtime) { openExit(); return; }
     }
   }
 
@@ -3076,6 +3192,11 @@
   $('btn-overtime').addEventListener('click', () => {
     ['victory'].forEach((id) => $(id).classList.add('hidden'));
     game.overtime = true; game.otLevel = 0;
+    removeExit();
+    dawn.sun.material.opacity = 0;
+    dawn.light.intensity = 0;
+    hemi.intensity = 0.55;
+    scene.fog.color.copy(dawn.fogFrom);
     ui.hud.classList.add('on');
     game.mode = 'playing';
     lockPointer();
@@ -3201,6 +3322,13 @@
     const r = Math.hypot(player.pos.x, player.pos.z);
     if (r > CFG.arenaR) {
       player.pos.x *= CFG.arenaR / r; player.pos.z *= CFG.arenaR / r;
+    }
+    // solid props
+    collideXZ(player.pos, 0.45);
+    // reaching the open exit ends the night
+    if (exit && Math.hypot(player.pos.x - exit.g.position.x, player.pos.z - exit.g.position.z) < 1.7) {
+      startEscape();
+      return;
     }
 
     // firing
@@ -3412,6 +3540,16 @@
       const rr = Math.hypot(e.mesh.position.x, e.mesh.position.z);
       const lim = CFG.arenaR + (e.kind === 'boss' ? 6 : 2);
       if (rr > lim) { e.mesh.position.x *= lim / rr; e.mesh.position.z *= lim / rr; }
+      // ground units collide with props; a charging shredder that rams one goes dizzy
+      if (e.kind === 'walker' || e.kind === 'copier' || e.kind === 'shredder') {
+        const rammed = collideXZ(e.mesh.position, e.r * 0.7);
+        if (rammed && e.kind === 'shredder' && e.state === 'charge') {
+          e.state = 'dizzy'; e.stateT = 1.2;
+          e.eye.scale.set(1, 1, 1);
+          burst(e.mesh.position, 0xb9c2d6, 0.16, 12);
+          Audio.sfx.hit();
+        }
+      }
       // decay knockback
       e.vel.multiplyScalar(Math.max(0, 1 - 1.8 * dt));
     }
@@ -3578,6 +3716,10 @@
     }
     ring.rotation.z += dt * 0.1;
     motes.update(dt);
+    if (exit) {
+      exit.t += dt;
+      exit.portalMat.opacity = 0.72 + Math.sin(exit.t * 3.2) * 0.18;
+    }
   }
 
   // ambient world life: rain, steam, beacons, neon flicker, flashes, dash ghosts
@@ -3657,7 +3799,7 @@
     if (game.betweenT > 0) {
       game.betweenT -= dt;
       if (game.betweenT <= 0) startWave(game.wave + 1);
-    } else if (game.spawnQueue.length === 0 && enemies.length === 0 && game.mode === 'playing') {
+    } else if (game.spawnQueue.length === 0 && enemies.length === 0 && game.mode === 'playing' && !exit) {
       waveCleared();
     }
     // combo decay
@@ -3683,7 +3825,10 @@
 
   function frame() {
     requestAnimationFrame(frame);
-    const rawDt = Math.min(clock.getDelta(), 0.05);
+    const rawDelta = clock.getDelta();
+    const rawDt = Math.min(rawDelta, 0.05);
+    // cinematic timers track wall time so scripted sequences don't stretch on slow devices
+    const wallDt = Math.min(rawDelta, 0.5);
 
     if (game.mode === 'playing') {
       // tempo (time slow)
@@ -3714,7 +3859,7 @@
       autoQuality(rawDt);
     } else if (game.mode === 'cinematic') {
       // boss introduction: letterboxed dolly toward The Deadline
-      game.cineT -= rawDt;
+      game.cineT -= wallDt;
       if (boss) {
         _v1.copy(player.pos).sub(boss.mesh.position).setY(0).normalize();
         _v2.set(
@@ -3734,9 +3879,39 @@
         game.mode = 'playing';
         document.body.classList.remove('cine');
       }
+    } else if (game.mode === 'escape') {
+      // the way out: Paul walks through the golden door as dawn breaks
+      game.escapeT -= wallDt;
+      const spd = 2.4;
+      player.pos.z -= spd * wallDt;
+      player.walkPhase += spd * wallDt * 1.6;
+      const swing = Math.sin(player.walkPhase) * 0.55;
+      heroRig.legL.hip.rotation.x = swing;
+      heroRig.legR.hip.rotation.x = -swing;
+      heroRig.legL.knee.rotation.x = Math.max(0, -swing) * 0.8;
+      heroRig.legR.knee.rotation.x = Math.max(0, swing) * 0.8;
+      heroRig.armL.shoulder.rotation.x = -swing * 0.7;
+      heroRig.armR.shoulder.rotation.x = swing * 0.7;
+      heroRig.body.rotation.x = 0;
+      heroRig.root.position.copy(player.pos);
+      heroRig.root.position.y = Math.abs(Math.sin(player.walkPhase)) * 0.05;
+      heroRig.root.rotation.y = Math.PI; // facing the exit, away from the city
+      // dawn breaks
+      const k = clamp(1 - game.escapeT / 5.2, 0, 1);
+      dawn.sun.material.opacity = k;
+      dawn.sun.scale.setScalar(30 + k * 34);
+      dawn.light.intensity = k * 1.3;
+      hemi.intensity = 0.55 + k * 0.5;
+      scene.fog.color.copy(dawn.fogFrom).lerp(dawn.fogTo, k * 0.85);
+      // camera trails dead-centre through the doorway, into the light
+      _v1.set(player.pos.x, 2.3, player.pos.z + 8);
+      camera.position.lerp(_v1, 1 - Math.pow(0.001, wallDt));
+      camera.lookAt(player.pos.x, 1.6, player.pos.z - 8);
+      updateFx(wallDt * 0.5);
+      if (game.escapeT <= 0) winGame();
     } else if (game.mode === 'dying') {
       // slow collapse + orbiting camera before the terminated screen
-      game.dieT -= rawDt;
+      game.dieT -= wallDt;
       heroRig.body.rotation.x = lerp(heroRig.body.rotation.x, -1.5, 1 - Math.pow(0.02, rawDt));
       camYaw += rawDt * 0.6;
       camPitch = Math.min(1.0, camPitch + rawDt * 0.35);
@@ -3753,7 +3928,7 @@
       }
     }
     updateAmbient(rawDt);
-    if (game.mode !== 'title' && game.mode !== 'lookdev' && game.mode !== 'cinematic') updateCamera(rawDt);
+    if (game.mode !== 'title' && game.mode !== 'lookdev' && game.mode !== 'cinematic' && game.mode !== 'escape') updateCamera(rawDt);
     if (FX.bloom) composer.render(); else renderer.render(scene, camera);
   }
 
@@ -3777,7 +3952,7 @@
         ult: game.ult, perks: [...player.perks], diff: game.diff, rings: slamRings.length,
         xp: careerXp, rank: RANKS[rankIdx(careerXp)][0], shake: +game.shake.toFixed(3),
         enemies: enemies.length, queued: game.spawnQueue.length,
-        hazards: hazards.length, pickups: pickups.length,
+        hazards: hazards.length, pickups: pickups.length, exit: !!exit,
         playerPos: { x: +player.pos.x.toFixed(2), y: +player.pos.y.toFixed(2), z: +player.pos.z.toFixed(2) },
         boss: boss ? { hp: boss.hp, phase: boss.phase } : null,
         drawCalls: renderer.info.render.calls, triangles: renderer.info.render.triangles,
@@ -3806,6 +3981,8 @@
     setDiff(d) { game.diff = d; },
     slam(x, z) { spawnSlamRing(x || 0, z || 0); },
     skipCine() { if (game.mode === 'cinematic') game.cineT = 0.01; },
+    gotoExit() { if (exit) player.pos.set(exit.g.position.x, 0, exit.g.position.z + 1.2); },
+    colliders,
     settings: SETTINGS,
   };
 })();

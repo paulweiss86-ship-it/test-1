@@ -82,6 +82,20 @@ function check(name, cond, extra) {
   await page.evaluate(() => window.__AH.key('KeyW', false));
   check('player moves with WASD', movedOk);
 
+  // ---- solid props: player cannot stand inside a planter ----
+  await page.evaluate(() => {
+    const AH = window.__AH;
+    const c = AH.colliders.find((k) => k.r > 1); // a planter
+    AH.player.pos.set(c.x, 0, c.z);
+  });
+  await page.waitForTimeout(500);
+  const propDist = await page.evaluate(() => {
+    const AH = window.__AH;
+    const c = AH.colliders.find((k) => k.r > 1);
+    return Math.hypot(AH.player.pos.x - c.x, AH.player.pos.z - c.z);
+  });
+  check('solid props push the player out (no clipping)', propDist > 1.2, `dist=${propDist.toFixed(2)}m`);
+
   // ---- jump ----
   await page.evaluate(() => window.__AH.key('Space', true));
   const jumpOk = await page.waitForFunction(
@@ -219,11 +233,24 @@ function check(name, cond, extra) {
   st = await page.evaluate(() => window.__AH.state());
   check('boss enters phase 2 below 50%', st.boss && st.boss.phase === 2, JSON.stringify(st.boss));
 
-  // ---- victory ----
+  // ---- endgame: boss falls → THE EXIT opens → walk out of the rat race ----
   await page.evaluate(() => { window.__AH.damageBoss(9999); window.__AH.killAll(); });
-  await page.waitForTimeout(800);
+  await page.waitForTimeout(600);
   st = await page.evaluate(() => window.__AH.state());
-  check('victory after boss dies', st.mode === 'victory', `mode=${st.mode}`);
+  check('exit opens when the boss falls', st.mode === 'playing' && st.exit === true, `mode=${st.mode} exit=${st.exit}`);
+  await page.evaluate(() => window.__AH.gotoExit());
+  const escapeOk = await page.waitForFunction(
+    () => window.__AH.state().mode === 'escape',
+    null, { timeout: 8000 }
+  ).then(() => true).catch(() => false);
+  check('reaching the exit starts the escape', escapeOk);
+  await page.waitForTimeout(2500);
+  await page.screenshot({ path: path.join(shotsDir, '09-escape.png') });
+  const vicOk = await page.waitForFunction(
+    () => window.__AH.state().mode === 'victory',
+    null, { timeout: 15000 }
+  ).then(() => true).catch(() => false);
+  check('victory after escaping the rat race', vicOk);
   await page.screenshot({ path: path.join(shotsDir, '06-victory.png') });
 
   // ---- game over path (death sequence → terminated screen) ----

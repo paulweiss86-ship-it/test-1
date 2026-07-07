@@ -4,9 +4,10 @@ A 3D third-person arena action game that runs entirely in the browser. No instal
 no build step, no external assets — one hero, one city, one very hostile clock.
 
 > The financial district, 11:58 PM. The office machines have unionized under a
-> corrupted mainframe called **THE DEADLINE**, and it has scheduled the end of the
-> world for midnight. One consultant stands in its way. Sharp suit. Sharper pens.
-> And a silver watch that can bend time itself.
+> corrupted mainframe called **THE DEADLINE** — and as long as it ticks, nobody
+> ever leaves this city. One consultant has had enough. Sharp suit. Sharper pens.
+> A silver watch that bends time itself. Destroy The Deadline and the exit opens:
+> tonight, Paul Weiss escapes the rat race for good.
 
 ## Play
 
@@ -40,11 +41,14 @@ joystick + touch buttons).
 
 ## The game
 
-- **6 waves** in the neon plaza: hover **drones**, suit-and-tie **walker bots**,
-  paper-lobbing **rogue copiers**, and telegraph-then-charge **shredders**, ending
-  with **THE DEADLINE** — a building-sized alarm clock with radial shard bursts,
-  aimed volleys, minion summons, jump-to-dodge slam shockwaves, and an enraged
-  phase below half health.
+- **The goal: escape the rat race.** Survive 6 waves — hover **drones**,
+  suit-and-tie **walker bots**, paper-lobbing **rogue copiers**, and
+  telegraph-then-charge **shredders** (solid props stop them; a shredder that
+  rams a planter goes dizzy) — then bring down **THE DEADLINE**, a building-sized
+  alarm clock with radial shard bursts, aimed volleys, minion summons,
+  jump-to-dodge slam shockwaves, and an enraged phase below half health.
+  When it falls, **THE EXIT opens** at the edge of the plaza: walk into the
+  golden light and leave the grind behind as dawn breaks.
 - **Executive Perks:** a roguelite draft after every wave — choose 1 of 3 from a
   pool of 9 (triple-shot pens, piercing, +damage, melee build, dash build, tempo
   efficiency, max-HP, lifesteal, permanent speed).
