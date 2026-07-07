@@ -9,20 +9,12 @@ const ROOT = path.join(__dirname, '..');
 const read = (p) => fs.readFileSync(path.join(ROOT, p), 'utf8');
 
 let html = read('index.html');
-const three = read('vendor/three.min.js');
-const game = read('src/game.js');
 
-html = html.replace(
-  '<script src="vendor/three.min.js"></script>',
-  () => `<script>\n${three}\n</script>`
-);
-html = html.replace(
-  '<script src="src/game.js"></script>',
-  () => `<script>\n${game}\n</script>`
-);
+// inline every local <script src> so the output is fully self-contained
+html = html.replace(/<script src="([^"]+)"><\/script>/g, (m, src) => `<script>\n${read(src)}\n</script>`);
 
-if (html.includes('vendor/three.min.js') || html.includes('src/game.js')) {
-  console.error('build failed: script tags not fully inlined');
+if (/<script src=/.test(html)) {
+  console.error('build failed: external script tags remain');
   process.exit(1);
 }
 

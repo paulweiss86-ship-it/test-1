@@ -17,6 +17,31 @@
 
   const $ = (id) => document.getElementById(id);
 
+  // Storage that never throws: sandboxed iframes and iOS Safari with tracking
+  // prevention raise SecurityError on any localStorage access, which would
+  // otherwise kill the whole game at boot. Falls back to in-memory for the session.
+  const store = (() => {
+    const mem = {};
+    let ls = null;
+    try {
+      ls = window.localStorage;
+      ls.setItem('__ah_probe', '1');
+      ls.removeItem('__ah_probe');
+    } catch (e) { ls = null; }
+    return {
+      get(k, d) {
+        try {
+          const v = ls ? ls.getItem(k) : mem[k];
+          return v == null ? d : v;
+        } catch (e) { return mem[k] == null ? d : mem[k]; }
+      },
+      set(k, v) {
+        mem[k] = String(v);
+        try { if (ls) ls.setItem(k, String(v)); } catch (e) { /* session-only */ }
+      },
+    };
+  })();
+
   // --------------------------------------------------------------- config --
   const CFG = {
     arenaR: 56,
@@ -745,6 +770,15 @@
   const IS_TOUCH = matchMedia('(pointer: coarse)').matches && 'ontouchstart' in window;
   if (IS_TOUCH) document.body.classList.add('touch');
 
+  // pointer lock is absent or gesture-restricted on some browsers — never let it throw
+  function lockPointer() {
+    if (IS_TOUCH || !canvas.requestPointerLock) return;
+    try {
+      const r = canvas.requestPointerLock();
+      if (r && typeof r.catch === 'function') r.catch(() => {});
+    } catch (e) { /* unsupported */ }
+  }
+
   document.addEventListener('keydown', (e) => {
     if (e.repeat) return;
     keys[e.code] = true;
@@ -762,7 +796,7 @@
     if (game.mode !== 'playing') return;
     if (e.button === 0) mouseDown = true;
     if (e.button === 2) rmbDown = true;
-    if (!IS_TOUCH && document.pointerLockElement !== canvas) canvas.requestPointerLock();
+    if (document.pointerLockElement !== canvas) lockPointer();
   });
   window.addEventListener('mouseup', (e) => {
     if (e.button === 0) mouseDown = false;
@@ -780,14 +814,14 @@
   // -------------------------------------------------------------- settings --
   const SETTINGS = Object.assign(
     { music: 50, sfx: 90, sens: 100, invertY: false, bloom: true, rain: true },
-    JSON.parse(localStorage.getItem('ah_settings') || '{}')
+    (() => { try { return JSON.parse(store.get('ah_settings', '{}')); } catch (e) { return {}; } })()
   );
   function applySettings() {
     Audio.setVolumes(SETTINGS.music / 100, SETTINGS.sfx / 100);
     FX.bloom = SETTINGS.bloom;
     FX.rain = SETTINGS.rain;
   }
-  function saveSettings() { localStorage.setItem('ah_settings', JSON.stringify(SETTINGS)); }
+  function saveSettings() { store.set('ah_settings', JSON.stringify(SETTINGS)); }
   (function wireSettings() {
     const bindRange = (id, key) => {
       const el = $(id); el.value = SETTINGS[key];
@@ -803,7 +837,7 @@
   })();
 
   // -------------------------------------------------------- career ladder --
-  let careerXp = +(localStorage.getItem('ah_xp') || 0);
+  let careerXp = +store.get('ah_xp', 0);
   function rankIdx(xp) {
     let i = 0;
     while (i + 1 < RANKS.length && xp >= RANKS[i + 1][1]) i++;
@@ -821,7 +855,7 @@
     if (delta <= 0) return null;
     const before = rankIdx(careerXp);
     careerXp += delta;
-    localStorage.setItem('ah_xp', String(careerXp));
+    store.set('ah_xp', careerXp);
     game.bankedScore = game.score;
     updateRankLine();
     const after = rankIdx(careerXp);
@@ -1374,7 +1408,7 @@
     hitstopT: 0, shake: 0, cineT: 0, dieT: 0, bankedScore: 0,
     time: 0, spawnQueue: [], spawnT: 0, betweenT: 0,
     overtime: false, otLevel: 0,
-    best: +(localStorage.getItem('ah_best') || 0),
+    best: +store.get('ah_best', 0),
     started: false,
     quality: { checked: false, acc: 0, n: 0 },
   };
@@ -1477,7 +1511,7 @@
     if (pk.id === 'parachute') { player.maxHp += 30; player.hp = player.maxHp; }
     $('perks').classList.add('hidden');
     game.mode = 'playing';
-    if (!IS_TOUCH) canvas.requestPointerLock();
+    lockPointer();
     game.betweenT = 2.0;
     showAnnounce(pk.name.toUpperCase(), 'PERK ACQUIRED', 1500);
   }
@@ -1588,7 +1622,7 @@
     hideEdgeArrows();
     const promo = bankScore();
     const t = Math.round(game.time);
-    if (game.score > game.best) { game.best = game.score; localStorage.setItem('ah_best', game.best); }
+    if (game.score > game.best) { game.best = game.score; store.set('ah_best', game.best); }
     $('vic-stats').innerHTML =
       `Final score <span class="v">${game.score}</span> · Best <span class="v">${game.best}</span><br>` +
       `Machines dismantled <span class="v">${game.kills}</span> · Time on the clock <span class="v">${Math.floor(t / 60)}:${String(t % 60).padStart(2, '0')}</span>` +
@@ -1613,7 +1647,7 @@
     document.exitPointerLock && document.exitPointerLock();
     document.body.classList.remove('cine');
     const promo = bankScore();
-    if (game.score > game.best) { game.best = game.score; localStorage.setItem('ah_best', game.best); }
+    if (game.score > game.best) { game.best = game.score; store.set('ah_best', game.best); }
     const t = Math.round(game.time);
     $('go-stats').innerHTML =
       `Score <span class="v">${game.score}</span> · Best <span class="v">${game.best}</span><br>` +
@@ -1633,7 +1667,7 @@
     } else if (game.mode === 'paused' && !force) {
       $('pause').classList.add('hidden');
       game.mode = 'playing';
-      if (!IS_TOUCH) canvas.requestPointerLock();
+      lockPointer();
     }
   }
 
@@ -1644,7 +1678,7 @@
     ui.hud.classList.add('on');
     game.mode = 'playing';
     Audio.startMusic();
-    if (!IS_TOUCH) canvas.requestPointerLock();
+    lockPointer();
     startWave(1);
     ui.hint.textContent = IS_TOUCH ? 'Left stick to move · drag right side to aim' : 'Hold Q or right-click to slow time with your watch';
     setTimeout(() => { ui.hint.textContent = ''; }, 6000);
@@ -1660,7 +1694,7 @@
     game.overtime = true; game.otLevel = 0;
     ui.hud.classList.add('on');
     game.mode = 'playing';
-    if (!IS_TOUCH) canvas.requestPointerLock();
+    lockPointer();
     player.hp = player.maxHp;
     startWave(game.wave + 1);
   });
