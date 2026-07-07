@@ -1,0 +1,15 @@
+{
+  "name": "after-hours",
+  "version": "1.0.0",
+  "description": "AFTER HOURS — Paul Weiss vs. The Deadline. A 3D browser arena action game built with Three.js.",
+  "private": true,
+  "scripts": {
+    "test": "node tests/run.js",
+    "lookdev": "node tools/lookdev.js",
+    "build": "node tools/build.js",
+    "serve": "python3 -m http.server 8080"
+  },
+  "devDependencies": {
+    "playwright-core": "^1.49.1"
+  }
+}

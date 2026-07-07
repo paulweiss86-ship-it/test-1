@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%E2%8C%9A%3C/text%3E%3C/svg%3E">
+<title>AFTER HOURS — Paul Weiss vs. The Deadline</title>
+<style>
+  :root {
+    --ink: #eaf2ff;
+    --dim: #8fa3c8;
+    --accent: #4db8ff;
+    --gold: #e8c15a;
+    --danger: #ff5d6c;
+    --panel: rgba(10, 16, 30, 0.82);
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { width: 100%; height: 100%; overflow: hidden; background: #05070d; }
+  body { font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif; color: var(--ink); }
+  #c { display: block; width: 100%; height: 100%; }
+
+  /* ---------- overlays ---------- */
+  .overlay {
+    position: fixed; inset: 0; display: flex; flex-direction: column;
+    align-items: center; justify-content: center; text-align: center;
+    background: radial-gradient(ellipse at 50% 40%, rgba(20,32,64,.88), rgba(4,6,12,.96));
+    z-index: 30; transition: opacity .4s ease;
+  }
+  .overlay.hidden { opacity: 0; pointer-events: none; }
+  .kicker {
+    letter-spacing: .55em; text-transform: uppercase; font-size: 13px;
+    color: var(--dim); margin-bottom: 14px;
+  }
+  h1.title {
+    font-size: clamp(44px, 9vw, 96px); font-weight: 800; letter-spacing: .08em;
+    line-height: 1; color: var(--ink);
+    text-shadow: 0 0 24px rgba(77,184,255,.55), 0 0 80px rgba(77,184,255,.25);
+  }
+  .subtitle { margin-top: 16px; font-size: clamp(14px, 2.2vw, 19px); color: var(--gold); letter-spacing: .18em; text-transform: uppercase; }
+  .tagline { margin-top: 10px; max-width: 620px; padding: 0 24px; color: var(--dim); font-size: 14px; line-height: 1.6; }
+  .btn {
+    margin-top: 34px; padding: 14px 54px; font-size: 17px; letter-spacing: .3em; text-transform: uppercase;
+    color: #06111f; background: linear-gradient(180deg, #7fd0ff, #2f9be0); border: 0; border-radius: 4px;
+    cursor: pointer; font-weight: 700; box-shadow: 0 0 30px rgba(77,184,255,.45);
+  }
+  .btn:hover { filter: brightness(1.12); }
+  .btn.secondary { background: transparent; color: var(--accent); border: 1px solid rgba(77,184,255,.5); box-shadow: none; }
+  .controls-hint { margin-top: 30px; font-size: 12.5px; color: var(--dim); line-height: 2; }
+  .controls-hint b { color: var(--ink); background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.18); border-radius: 4px; padding: 1px 7px; font-weight: 600; }
+  .stat-lines { margin-top: 18px; font-size: 15px; color: var(--dim); line-height: 2.1; }
+  .stat-lines .v { color: var(--gold); font-weight: 700; }
+  #gameover h1.title { text-shadow: 0 0 24px rgba(255,93,108,.55); }
+  .fineprint { position: absolute; bottom: 18px; font-size: 11px; color: rgba(143,163,200,.55); letter-spacing: .12em; }
+
+  /* ---------- HUD ---------- */
+  #hud { position: fixed; inset: 0; pointer-events: none; z-index: 20; opacity: 0; transition: opacity .4s; }
+  #hud.on { opacity: 1; }
+  .hud-corner { position: absolute; left: 22px; bottom: 20px; width: min(320px, 42vw); }
+  .hud-name { font-size: 12px; letter-spacing: .3em; color: var(--dim); text-transform: uppercase; margin-bottom: 6px; }
+  .hud-name b { color: var(--ink); }
+  .bar { height: 13px; background: rgba(255,255,255,.09); border: 1px solid rgba(255,255,255,.16); border-radius: 3px; overflow: hidden; margin-bottom: 7px; }
+  .bar > i { display: block; height: 100%; width: 100%; transition: width .12s linear; }
+  #hpbar > i { background: linear-gradient(90deg, #37e08d, #7ff0b8); box-shadow: 0 0 12px rgba(55,224,141,.6); }
+  #hpbar.low > i { background: linear-gradient(90deg, #ff5d6c, #ff9d7c); }
+  #watchbar { height: 9px; }
+  #watchbar > i { background: linear-gradient(90deg, #4db8ff, #b48dff); box-shadow: 0 0 10px rgba(120,150,255,.6); }
+  .watch-label { font-size: 10px; letter-spacing: .25em; color: var(--dim); text-transform: uppercase; }
+  #score-wrap { position: absolute; top: 18px; right: 24px; text-align: right; }
+  #score { font-size: 30px; font-weight: 800; letter-spacing: .06em; text-shadow: 0 0 16px rgba(77,184,255,.5); }
+  #combo { font-size: 13px; color: var(--gold); letter-spacing: .2em; min-height: 17px; }
+  #wave-label { position: absolute; top: 18px; left: 24px; font-size: 13px; letter-spacing: .3em; color: var(--dim); text-transform: uppercase; }
+  #wave-label b { color: var(--ink); font-size: 16px; }
+  #announce {
+    position: absolute; top: 26%; left: 0; right: 0; text-align: center;
+    font-size: clamp(26px, 5vw, 52px); font-weight: 800; letter-spacing: .3em; text-transform: uppercase;
+    color: var(--ink); text-shadow: 0 0 30px rgba(77,184,255,.7); opacity: 0; transition: opacity .3s;
+  }
+  #announce.show { opacity: 1; }
+  #announce small { display: block; font-size: 14px; letter-spacing: .4em; color: var(--gold); margin-top: 10px; }
+  #bosswrap { position: absolute; top: 64px; left: 50%; transform: translateX(-50%); width: min(560px, 76vw); display: none; }
+  #bosswrap.on { display: block; }
+  #bossname { text-align: center; font-size: 12px; letter-spacing: .5em; color: var(--danger); text-transform: uppercase; margin-bottom: 6px; }
+  #bossbar > i { background: linear-gradient(90deg, #ff5d6c, #ffb45d); box-shadow: 0 0 14px rgba(255,93,108,.65); }
+  #crosshair {
+    position: absolute; top: 50%; left: 50%; width: 6px; height: 6px; margin: -3px;
+    border-radius: 50%; background: rgba(234,242,255,.9); box-shadow: 0 0 8px rgba(77,184,255,.9), 0 0 2px #fff;
+  }
+  #vignette { position: fixed; inset: 0; pointer-events: none; z-index: 15; opacity: 0; transition: opacity .25s;
+    background: radial-gradient(ellipse at center, transparent 55%, rgba(255,20,40,.5) 100%); }
+  #tempotint { position: fixed; inset: 0; pointer-events: none; z-index: 14; opacity: 0; transition: opacity .18s;
+    background: radial-gradient(ellipse at center, rgba(70,110,255,.06) 40%, rgba(90,60,255,.22) 100%); }
+  #hint { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); font-size: 12px; letter-spacing: .18em; color: rgba(143,163,200,.85); text-transform: uppercase; white-space: nowrap; }
+
+  /* popups */
+  .popup { position: fixed; z-index: 18; pointer-events: none; font-weight: 800; font-size: 15px; color: var(--gold);
+    text-shadow: 0 0 8px rgba(0,0,0,.8); transition: transform .7s ease-out, opacity .7s ease-out; }
+
+  /* ---------- touch controls ---------- */
+  #touch { position: fixed; inset: 0; z-index: 25; pointer-events: none; display: none; }
+  body.touch #touch { display: block; }
+  body.touch #crosshair { display: none; }
+  .stick { position: absolute; bottom: 90px; left: 34px; width: 120px; height: 120px; border-radius: 50%;
+    border: 2px solid rgba(255,255,255,.22); background: rgba(255,255,255,.05); pointer-events: auto; }
+  .stick .nub { position: absolute; left: 50%; top: 50%; width: 52px; height: 52px; margin: -26px; border-radius: 50%;
+    background: rgba(160,200,255,.35); border: 1px solid rgba(255,255,255,.35); }
+  .tbtn { position: absolute; width: 66px; height: 66px; border-radius: 50%; pointer-events: auto;
+    border: 2px solid rgba(255,255,255,.25); background: rgba(255,255,255,.07); color: var(--ink);
+    font-size: 11px; letter-spacing: .08em; font-weight: 700; display: flex; align-items: center; justify-content: center; }
+  .tbtn:active { background: rgba(77,184,255,.4); }
+  #tb-fire { right: 30px; bottom: 150px; }
+  #tb-dash { right: 116px; bottom: 84px; }
+  #tb-jump { right: 30px; bottom: 62px; }
+  #tb-slow { right: 130px; bottom: 176px; }
+</style>
+</head>
+<body>
+<canvas id="c"></canvas>
+
+<div id="vignette"></div>
+<div id="tempotint"></div>
+
+<div id="hud">
+  <div id="wave-label">Wave <b id="wave-num">1</b> <span id="wave-left"></span></div>
+  <div id="score-wrap">
+    <div id="score">0</div>
+    <div id="combo"></div>
+  </div>
+  <div id="bosswrap">
+    <div id="bossname">The Deadline</div>
+    <div class="bar" id="bossbar"><i></i></div>
+  </div>
+  <div class="hud-corner">
+    <div class="hud-name"><b>Paul Weiss</b> · Senior Partner, Field Ops</div>
+    <div class="bar" id="hpbar"><i></i></div>
+    <div class="bar" id="watchbar"><i></i></div>
+    <div class="watch-label">Tempo — hold right-click / Q</div>
+  </div>
+  <div id="announce"></div>
+  <div id="crosshair"></div>
+  <div id="hint"></div>
+</div>
+
+<div id="touch">
+  <div class="stick" id="stick"><div class="nub" id="nub"></div></div>
+  <button class="tbtn" id="tb-fire">PEN</button>
+  <button class="tbtn" id="tb-dash">DASH</button>
+  <button class="tbtn" id="tb-jump">JUMP</button>
+  <button class="tbtn" id="tb-slow">TEMPO</button>
+</div>
+
+<div class="overlay" id="title">
+  <div class="kicker">A Weiss &amp; Partners Production · Est. 1986</div>
+  <h1 class="title">AFTER&nbsp;HOURS</h1>
+  <div class="subtitle">Paul Weiss vs. The Deadline</div>
+  <p class="tagline">The financial district, 11:58 PM. The office machines have unionized under a corrupted
+    mainframe called <b>THE DEADLINE</b> — and it has scheduled the end of the world for midnight.
+    One consultant stands in its way. Sharp suit. Sharper pens. And a silver watch that can bend time itself.</p>
+  <button class="btn" id="btn-start">Clock In</button>
+  <div class="controls-hint">
+    <b>W A S D</b> move &nbsp; <b>Mouse</b> aim &nbsp; <b>Click / F</b> throw pen &nbsp; <b>E</b> briefcase swing<br>
+    <b>Space</b> jump &nbsp; <b>Shift</b> dash &nbsp; <b>Q / Right-click</b> hold to slow time &nbsp; <b>M</b> mute &nbsp; <b>P</b> pause
+  </div>
+  <div class="fineprint">RUNS ENTIRELY IN YOUR BROWSER · BUILT WITH THREE.JS</div>
+</div>
+
+<div class="overlay hidden" id="pause">
+  <div class="kicker">On Hold</div>
+  <h1 class="title" style="font-size:clamp(34px,6vw,64px)">PAUSED</h1>
+  <button class="btn" id="btn-resume">Resume</button>
+  <button class="btn secondary" id="btn-restart-p">Restart</button>
+</div>
+
+<div class="overlay hidden" id="gameover">
+  <div class="kicker">Out of Office</div>
+  <h1 class="title" style="font-size:clamp(34px,7vw,72px); color:#ffb0b8">TERMINATED</h1>
+  <div class="stat-lines" id="go-stats"></div>
+  <button class="btn" id="btn-retry">Back to Work</button>
+</div>
+
+<div class="overlay hidden" id="victory">
+  <div class="kicker">Engagement Closed</div>
+  <h1 class="title" style="font-size:clamp(30px,6vw,64px); color:#ffe9a8; text-shadow:0 0 30px rgba(232,193,90,.6)">DEADLINE&nbsp;DEFEATED</h1>
+  <div class="subtitle" style="color:var(--accent)">The city sleeps. Paul clocks out.</div>
+  <div class="stat-lines" id="vic-stats"></div>
+  <button class="btn" id="btn-overtime">Overtime Mode (Endless)</button>
+  <button class="btn secondary" id="btn-restart-v">Play Again</button>
+</div>
+
+<script src="vendor/three.min.js"></script>
+<script src="src/game.js"></script>
+</body>
+</html>
