@@ -35,9 +35,9 @@ delivered to listeners as a bonus asset (web page or printed/PDF handout).
 
 `quiz-folge-1335.html` is an interactive self-diagnosis quiz derived from
 episode 1335 ("Warum Du als Unternehmer nicht alles allein tragen darfst").
-Single file, React state only (React 18 + Babel via CDN, so it needs an
-internet connection when opened), no backend, no APIs, mobile-first in the
-black/gold brand look.
+Single file, React state only, no backend, no APIs, mobile-first in the
+black/gold brand look. React 18 is inlined into the file (no CDN), so it is
+fully self-contained and works offline — just open it in any browser.
 
 - 7 consultant-style multiple-choice questions (informal "Du" tone), one at a
   time with progress bar and smooth transitions.
