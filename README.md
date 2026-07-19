@@ -31,6 +31,28 @@ delivered to listeners as a bonus asset (web page or printed/PDF handout).
 | 08 | Ressourcen | Links and resources mentioned in the episode | yes |
 | 09 | Call-to-Action | Booking CTA (raykhahne.de/austausch) | yes |
 
+## Episoden-Quiz (Unternehmer-Check)
+
+`quiz-folge-1335.html` is an interactive self-diagnosis quiz derived from
+episode 1335 ("Warum Du als Unternehmer nicht alles allein tragen darfst").
+Single file, React state only (React 18 + Babel via CDN, so it needs an
+internet connection when opened), no backend, no APIs, mobile-first in the
+black/gold brand look.
+
+- 7 consultant-style multiple-choice questions (informal "Du" tone), one at a
+  time with progress bar and smooth transitions.
+- Point-based scoring (0–3 per answer, 21 max) mapped to 3 result tiers:
+  "Rote Zone", "Solide – aber Du verschenkst Zeit und Gewinn", "Top 10 %".
+- Personalized analysis: the result names the listener's weakest dimensions
+  (Unabhängigkeit, Engpass, Delegation, Loslassen, Struktur, Sparring,
+  Freiheit) and shows up to 3 quick wins derived from their lowest-scoring
+  answers — not just the total.
+- CTA: free 20-minute call with Rayk Hahne (`CONFIG.ctaUrl`, currently
+  raykhahne.de/austausch — replace with the real booking link).
+- To adapt for another episode, edit only the `CONFIG` and `QUESTIONS`/`TIERS`
+  objects at the top of the script; the UI, scoring and analysis derive from
+  them.
+
 ### Theming
 
 All colors are defined as CSS variables in `:root`. The default theme matches

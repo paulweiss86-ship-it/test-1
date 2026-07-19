@@ -1,0 +1,734 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Unternehmer-Check: Trägst Du alles allein? | Folge 1335 – Unternehmerwissen in 15 Minuten</title>
+
+<!-- ============================================================
+  RAYK HAHNE UNTERNEHMERWISSEN – EPISODEN-QUIZ (Folge 1335)
+  ============================================================
+  Self-diagnosis quiz derived from episode 1335:
+  "Warum Du als Unternehmer nicht alles allein tragen darfst."
+
+  - Single file, no backend, no external APIs.
+  - All quiz state lives in React (loaded from CDN below, so the
+    file needs an internet connection when opened).
+  - To adapt for another episode: edit the QUIZ config object
+    (episode meta, questions, tiers) — the UI derives everything
+    from it, including scoring, weakest-answer analysis and
+    quick wins.
+  - CTA link: replace CONFIG.ctaUrl with the real booking link.
+  ============================================================ -->
+
+<script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+<style>
+  :root {
+    --gold:       #D9B44A;
+    --gold-light: #EED688;
+    --gold-deep:  #A9862A;
+    --grad: linear-gradient(115deg, #A9862A 0%, #D9B44A 45%, #EED688 100%);
+    --bg:      #0B0B09;
+    --bg-2:    #161510;
+    --card:    #1C1B14;
+    --line:    rgba(217,180,74,.22);
+    --text:    #F4F1E8;
+    --muted:   #A5A092;
+    --danger:  #E06C5A;
+    --ok:      #8FBF7F;
+    --radius:  18px;
+    --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+            "Helvetica Neue", Arial, sans-serif;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+
+  body {
+    font-family: var(--font);
+    background:
+      radial-gradient(90% 60% at 50% 0%, #23221A 0%, rgba(35,34,26,0) 60%),
+      var(--bg);
+    color: var(--text);
+    line-height: 1.55;
+    min-height: 100vh;
+  }
+
+  #root { min-height: 100vh; display: flex; flex-direction: column; }
+
+  .wrap {
+    width: 100%;
+    max-width: 560px;
+    margin: 0 auto;
+    padding: 20px 20px 32px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ---------- brand bar ---------- */
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 0 22px;
+  }
+  .brand .rh {
+    font-size: 1.5rem;
+    font-weight: 900;
+    letter-spacing: -.04em;
+    background: var(--grad);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .brand .t b {
+    display: block;
+    font-size: .72rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+  }
+  .brand .t small {
+    display: block;
+    font-size: .44rem;
+    font-weight: 600;
+    letter-spacing: .34em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  /* ---------- progress ---------- */
+  .progress { margin-bottom: 26px; }
+  .progress .info {
+    display: flex;
+    justify-content: space-between;
+    font-size: .72rem;
+    font-weight: 700;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 8px;
+  }
+  .bar {
+    height: 6px;
+    background: rgba(255,255,255,.08);
+    border-radius: 100px;
+    overflow: hidden;
+  }
+  .bar i {
+    display: block;
+    height: 100%;
+    background: var(--grad);
+    border-radius: 100px;
+    transition: width .45s cubic-bezier(.22,.9,.36,1);
+  }
+
+  /* ---------- screen transitions ---------- */
+  .screen {
+    animation: in .42s cubic-bezier(.22,.9,.36,1) both;
+  }
+  .screen.out {
+    animation: out .28s ease both;
+  }
+  @keyframes in  { from { opacity: 0; transform: translateX(26px); } to { opacity: 1; transform: none; } }
+  @keyframes out { from { opacity: 1; transform: none; } to { opacity: 0; transform: translateX(-26px); } }
+  @media (prefers-reduced-motion: reduce) {
+    .screen, .screen.out { animation: none; }
+  }
+
+  /* ---------- start ---------- */
+  .kicker {
+    display: inline-block;
+    font-size: .66rem;
+    font-weight: 800;
+    letter-spacing: .18em;
+    text-transform: uppercase;
+    color: var(--gold);
+    border: 1px solid var(--line);
+    border-radius: 100px;
+    padding: 6px 14px;
+    margin-bottom: 18px;
+  }
+  h1 {
+    font-size: clamp(1.6rem, 6vw, 2.1rem);
+    font-weight: 800;
+    line-height: 1.18;
+    text-transform: uppercase;
+    letter-spacing: .01em;
+  }
+  h1 .g {
+    background: var(--grad);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .intro { color: var(--muted); margin-top: 14px; font-size: 1rem; }
+  .facts { list-style: none; margin: 22px 0 28px; }
+  .facts li {
+    display: flex;
+    gap: 10px;
+    align-items: baseline;
+    font-size: .92rem;
+    padding: 6px 0;
+  }
+  .facts .dot { color: var(--gold); font-weight: 800; }
+
+  /* ---------- question ---------- */
+  .q-title {
+    font-size: 1.28rem;
+    font-weight: 800;
+    line-height: 1.3;
+    margin-bottom: 6px;
+  }
+  .q-sub { color: var(--muted); font-size: .9rem; margin-bottom: 20px; }
+
+  .opt {
+    width: 100%;
+    text-align: left;
+    font: inherit;
+    color: var(--text);
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 15px 16px;
+    margin-bottom: 10px;
+    cursor: pointer;
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    transition: border-color .15s, background .15s, transform .15s;
+  }
+  .opt:hover { border-color: var(--gold); transform: translateY(-1px); }
+  .opt .key {
+    flex: none;
+    width: 26px; height: 26px;
+    border-radius: 8px;
+    display: grid;
+    place-items: center;
+    font-size: .78rem;
+    font-weight: 800;
+    color: var(--gold);
+    background: rgba(217,180,74,.12);
+    border: 1px solid var(--line);
+    margin-top: 1px;
+  }
+  .opt.sel {
+    background: rgba(217,180,74,.14);
+    border-color: var(--gold);
+  }
+  .opt.sel .key { background: var(--grad); color: #0B0B09; }
+  .opt span.txt { font-size: .95rem; }
+
+  .nav-back {
+    background: none;
+    border: none;
+    color: var(--muted);
+    font: inherit;
+    font-size: .82rem;
+    font-weight: 700;
+    cursor: pointer;
+    padding: 10px 0;
+    margin-top: 6px;
+  }
+  .nav-back:hover { color: var(--gold); }
+
+  /* ---------- result ---------- */
+  .tier-badge {
+    display: inline-block;
+    font-size: .66rem;
+    font-weight: 800;
+    letter-spacing: .16em;
+    text-transform: uppercase;
+    border-radius: 100px;
+    padding: 7px 16px;
+    margin-bottom: 16px;
+  }
+  .tier-0 { background: rgba(224,108,90,.15); color: var(--danger); border: 1px solid rgba(224,108,90,.4); }
+  .tier-1 { background: rgba(217,180,74,.12); color: var(--gold); border: 1px solid var(--line); }
+  .tier-2 { background: rgba(143,191,127,.14); color: var(--ok); border: 1px solid rgba(143,191,127,.4); }
+
+  .score-row {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    margin: 20px 0 22px;
+  }
+  .ring { flex: none; width: 92px; height: 92px; position: relative; }
+  .ring svg { transform: rotate(-90deg); }
+  .ring .val {
+    position: absolute; inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-weight: 900;
+    font-size: 1.25rem;
+    line-height: 1.1;
+  }
+  .ring .val small { font-size: .52rem; color: var(--muted); font-weight: 700; letter-spacing: .04em; }
+  .analysis { color: var(--text); font-size: .96rem; }
+  .analysis b { color: var(--gold-light); }
+
+  .qw-label {
+    font-size: .7rem;
+    font-weight: 800;
+    letter-spacing: .2em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin: 26px 0 12px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .qw-label::before { content: ""; width: 22px; height: 3px; background: var(--grad); border-radius: 2px; }
+  .qw {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 16px 18px;
+    margin-bottom: 10px;
+  }
+  .qw h3 { font-size: .95rem; font-weight: 800; margin-bottom: 4px; }
+  .qw h3 span { color: var(--gold); margin-right: 8px; }
+  .qw p { font-size: .88rem; color: var(--muted); }
+
+  .cta-box {
+    margin-top: 26px;
+    background:
+      radial-gradient(120% 120% at 90% 0%, #26251B 0%, rgba(38,37,27,0) 60%),
+      var(--bg-2);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 24px 22px;
+    text-align: center;
+  }
+  .cta-box h2 {
+    font-size: 1.05rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: .03em;
+    margin-bottom: 8px;
+  }
+  .cta-box p { color: var(--muted); font-size: .88rem; margin-bottom: 18px; }
+
+  .btn {
+    display: inline-block;
+    background: var(--grad);
+    color: #0B0B09;
+    font-weight: 800;
+    font-size: .85rem;
+    letter-spacing: .07em;
+    text-transform: uppercase;
+    padding: 16px 28px;
+    border-radius: 100px;
+    border: none;
+    cursor: pointer;
+    text-decoration: none;
+    font-family: inherit;
+    box-shadow: 0 10px 26px rgba(217,180,74,.28);
+    transition: transform .12s ease;
+  }
+  .btn:hover { transform: translateY(-2px); }
+
+  .restart {
+    display: block;
+    margin: 18px auto 0;
+    background: none;
+    border: none;
+    color: var(--muted);
+    font: inherit;
+    font-size: .8rem;
+    font-weight: 700;
+    cursor: pointer;
+  }
+  .restart:hover { color: var(--gold); }
+
+  footer {
+    text-align: center;
+    color: var(--muted);
+    font-size: .74rem;
+    padding: 22px 20px 30px;
+  }
+  footer b { color: rgba(244,241,232,.8); font-weight: 700; }
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script type="text/babel" data-presets="react">
+const { useState, useMemo } = React;
+
+/* ============================================================
+   CONFIG — everything episode-specific lives here.
+   ============================================================ */
+const CONFIG = {
+  episode: "1335",
+  episodeTitle: "Warum Du als Unternehmer nicht alles allein tragen darfst.",
+  podcast: "Unternehmerwissen in 15 Minuten",
+  host: "Rayk Hahne",
+  ctaUrl: "https://raykhahne.de/austausch",   // <-- replace with real booking link
+};
+
+/* Each question: dim = the diagnosed dimension, options with
+   points (0–3), and a quickWin shown if the answer scored <= 1. */
+const QUESTIONS = [
+  {
+    dim: "Unabhängigkeit",
+    q: "Stell Dir vor: Du bist zwei Wochen offline – kein Laptop, kein Handy. Was passiert in Deinem Unternehmen?",
+    sub: "Sei ehrlich. Niemand außer Dir sieht Dein Ergebnis.",
+    options: [
+      { t: "Es läuft weiter, als wäre ich da. Mein Team entscheidet selbst.", p: 3 },
+      { t: "Das Tagesgeschäft läuft – aber wichtige Entscheidungen bleiben liegen.", p: 2 },
+      { t: "Ich würde trotzdem täglich reinschauen. Sicher ist sicher.", p: 1 },
+      { t: "Zwei Wochen offline? Völlig undenkbar.", p: 0 },
+    ],
+    quickWin: {
+      title: "Der 48-Stunden-Test",
+      text: "Bevor Du zwei Wochen planst: Sei ein Wochenende komplett nicht erreichbar. Notiere danach, was wirklich schiefging – die Liste ist fast immer kürzer als die Angst davor.",
+    },
+  },
+  {
+    dim: "Engpass",
+    q: "Wie viele Entscheidungen der letzten Woche liefen ausschließlich über Deinen Tisch?",
+    sub: "Von der Preisfreigabe bis zur Urlaubsplanung.",
+    options: [
+      { t: "Nur die strategischen – der Rest wird ohne mich entschieden.", p: 3 },
+      { t: "Ungefähr die Hälfte. An mir hängt noch zu viel Operatives.", p: 2 },
+      { t: "Die meisten. Mein Team fragt lieber einmal mehr nach.", p: 1 },
+      { t: "Praktisch alle. Ohne mich läuft hier nichts.", p: 0 },
+    ],
+    quickWin: {
+      title: "Engpass-Liste schreiben",
+      text: "Notiere diese Woche jede Entscheidung, die über Deinen Tisch geht. Markiere alles, was ein eingearbeiteter Mitarbeiter genauso gut entscheiden könnte – das ist Deine Delegationsliste.",
+    },
+  },
+  {
+    dim: "Delegation",
+    q: "Wenn Du etwas abgibst – was übergibst Du wirklich?",
+    sub: "Aufgabe, Verantwortung oder Ergebnis? Das ist ein Unterschied.",
+    options: [
+      { t: "Ziel, Rahmen und Messgröße. Den Weg dorthin bestimmt mein Team.", p: 3 },
+      { t: "Die Aufgabe mit genauer Anleitung – Zwischenschritte kontrolliere ich.", p: 2 },
+      { t: "Ich gebe ab, ziehe es aber oft wieder an mich. Geht ja schneller.", p: 1 },
+      { t: "Ehrlich? Ich gebe kaum etwas ab.", p: 0 },
+    ],
+    quickWin: {
+      title: "Ein Ergebnis komplett übergeben",
+      text: "Wähle diese Woche einen Bereich und übergib nicht die Aufgabe, sondern das Ergebnis: Ziel, Rahmen, Messgröße definieren – und den Weg dorthin bewusst loslassen.",
+    },
+  },
+  {
+    dim: "Loslassen",
+    q: "Hand aufs Herz: Warum machst Du so vieles noch selbst?",
+    sub: "Die Antwort verrät mehr über Dich als über Dein Team.",
+    options: [
+      { t: "Mache ich nicht – ich arbeite nur an dem, was wirklich nur ich kann.", p: 3 },
+      { t: "Es geht schneller, als es jemandem zu erklären.", p: 1 },
+      { t: "So gut wie ich macht es einfach niemand.", p: 1 },
+      { t: "Meine Kunden erwarten mich persönlich – bei allem.", p: 0 },
+    ],
+    quickWin: {
+      title: "Einmal erklären statt zehnmal machen",
+      text: "„Es geht schneller, als es zu erklären“ stimmt genau einmal. Nimm die nächste wiederkehrende Aufgabe als kurzes Video auf, während Du sie erledigst – ab dann macht sie jemand anderes.",
+    },
+  },
+  {
+    dim: "Struktur",
+    q: "Gibt es ein dokumentiertes System, nach dem Dein Unternehmen arbeitet – auch ohne Dich?",
+    sub: "Bei anderen sieht es nur einfach aus, weil dort ein System arbeitet.",
+    options: [
+      { t: "Ja. Klare Prozesse, die jeder findet und ohne mich funktionieren.", p: 3 },
+      { t: "Teilweise dokumentiert – vieles steckt aber noch in einzelnen Köpfen.", p: 2 },
+      { t: "Das meiste steckt in genau einem Kopf: meinem.", p: 1 },
+      { t: "System? Wir löschen hier hauptsächlich Brände.", p: 0 },
+    ],
+    quickWin: {
+      title: "Einen Prozess pro Woche dokumentieren",
+      text: "Kein Mammutprojekt: eine Seite, ein Prozess, jede Woche. Beginne mit dem Ablauf, bei dem Dein Team Dich am häufigsten unterbricht.",
+    },
+  },
+  {
+    dim: "Sparring",
+    q: "Mit wem sprichst Du über Deine größten unternehmerischen Baustellen?",
+    sub: "Kein Weltmeister trainiert ohne Trainer.",
+    options: [
+      { t: "Regelmäßig mit einem Mentor oder Unternehmern, die weiter sind als ich.", p: 3 },
+      { t: "Ab und zu mit befreundeten Unternehmern – aber ohne System.", p: 2 },
+      { t: "Mit Partner oder Familie – die kennen mein Business aber nur von außen.", p: 1 },
+      { t: "Mit niemandem. Das trage ich mit mir selbst aus.", p: 0 },
+    ],
+    quickWin: {
+      title: "Sparringspartner festlegen",
+      text: "Schreibe drei Menschen auf, die unternehmerisch dort sind, wo Du hinwillst – und vereinbare mit einem davon in den nächsten 7 Tagen ein Gespräch.",
+    },
+  },
+  {
+    dim: "Freiheit",
+    q: "Wann hattest Du zuletzt eine Woche mit festen, unverhandelbaren Zeiten für Familie, Sport und Dich selbst?",
+    sub: "Dein Unternehmen soll Dir Freiheit geben – nicht andersherum.",
+    options: [
+      { t: "Das ist mein Standard. Diese Blöcke stehen zuerst im Kalender.", p: 3 },
+      { t: "Ich plane es – aber die Arbeit überschreibt es regelmäßig.", p: 2 },
+      { t: "Am Wochenende manchmal. Unter der Woche unrealistisch.", p: 1 },
+      { t: "Ich kann mich ehrlich nicht erinnern.", p: 0 },
+    ],
+    quickWin: {
+      title: "Zwei Blöcke fest eintragen",
+      text: "Blocke jetzt zwei unverhandelbare Termine für Familie oder Sport in den nächsten 7 Tagen – und behandle sie wie Deinen wichtigsten Kundentermin.",
+    },
+  },
+];
+
+const MAX = QUESTIONS.reduce((s, q) => s + Math.max(...q.options.map(o => o.p)), 0);
+
+const TIERS = [
+  {
+    min: 0,
+    cls: "tier-0",
+    name: "Rote Zone: Du bist das Unternehmen",
+    text: "Gerade hängt fast alles an Dir – Entscheidungen, Wissen, Verantwortung. Das fühlt sich nach Kontrolle an, ist aber das größte Risiko für Dein Unternehmen und Deine Gesundheit. Die gute Nachricht: Genau hier sind die Hebel am größten.",
+  },
+  {
+    min: 9,
+    cls: "tier-1",
+    name: "Solide – aber Du verschenkst Zeit und Gewinn",
+    text: "Dein Unternehmen steht, vieles funktioniert. Aber an entscheidenden Stellen läuft noch zu viel über Deinen Tisch – und das kostet Dich jede Woche Stunden, die in Strategie, Familie oder Fitness gehören.",
+  },
+  {
+    min: 16,
+    cls: "tier-2",
+    name: "Top 10 % – Unternehmer statt Umsetzer",
+    text: "Stark: Du hast verstanden, dass Loslassen kein Kontrollverlust ist, sondern Führung. Jetzt geht es um Feinschliff – die letzten Bereiche, in denen Du noch selbst trägst, statt tragen zu lassen.",
+  },
+];
+
+function tierFor(score) {
+  return [...TIERS].reverse().find(t => score >= t.min);
+}
+
+/* ============================================================
+   UI COMPONENTS
+   ============================================================ */
+
+function Brand() {
+  return (
+    <div className="brand">
+      <span className="rh">RH</span>
+      <span className="t">
+        <b>Rayk Hahne</b>
+        <small>Unternehmerwissen</small>
+      </span>
+    </div>
+  );
+}
+
+function Progress({ step, total }) {
+  const pct = (step / total) * 100;
+  return (
+    <div className="progress">
+      <div className="info">
+        <span>Frage {step} von {total}</span>
+        <span>{Math.round(pct)} %</span>
+      </div>
+      <div className="bar"><i style={{ width: pct + "%" }} /></div>
+    </div>
+  );
+}
+
+function Start({ onStart }) {
+  return (
+    <div className="screen">
+      <span className="kicker">Unternehmer-Check · Folge {CONFIG.episode}</span>
+      <h1>Trägst Du Dein Unternehmen <span className="g">allein?</span></h1>
+      <p className="intro">
+        {QUESTIONS.length} Fragen, 2 Minuten, ehrliche Antworten – und Du weißt,
+        ob Dein Unternehmen von Dir abhängt oder für Dich arbeitet.
+      </p>
+      <ul className="facts">
+        <li><span className="dot">→</span>Basiert auf Folge {CONFIG.episode}: „{CONFIG.episodeTitle}"</li>
+        <li><span className="dot">→</span>Persönliche Auswertung mit Deinen größten Hebeln</li>
+        <li><span className="dot">→</span>Konkrete Quick Wins für die nächsten 7 Tage</li>
+      </ul>
+      <button className="btn" onClick={onStart}>Check starten</button>
+    </div>
+  );
+}
+
+function Question({ index, answer, onSelect, onBack, animKey }) {
+  const q = QUESTIONS[index];
+  const letters = ["A", "B", "C", "D"];
+  return (
+    <div className="screen" key={animKey}>
+      <Progress step={index + 1} total={QUESTIONS.length} />
+      <h2 className="q-title">{q.q}</h2>
+      <p className="q-sub">{q.sub}</p>
+      {q.options.map((o, i) => (
+        <button
+          key={i}
+          className={"opt" + (answer === i ? " sel" : "")}
+          onClick={() => onSelect(i)}
+        >
+          <span className="key">{letters[i]}</span>
+          <span className="txt">{o.t}</span>
+        </button>
+      ))}
+      {index > 0 && (
+        <button className="nav-back" onClick={onBack}>← Zurück zur vorherigen Frage</button>
+      )}
+    </div>
+  );
+}
+
+function ScoreRing({ score }) {
+  const r = 40, c = 2 * Math.PI * r;
+  const pct = score / MAX;
+  return (
+    <div className="ring">
+      <svg width="92" height="92" viewBox="0 0 92 92">
+        <circle cx="46" cy="46" r={r} fill="none" stroke="rgba(255,255,255,.08)" strokeWidth="8" />
+        <circle
+          cx="46" cy="46" r={r} fill="none"
+          stroke="url(#gg)" strokeWidth="8" strokeLinecap="round"
+          strokeDasharray={c}
+          strokeDashoffset={c * (1 - pct)}
+          style={{ transition: "stroke-dashoffset 1s cubic-bezier(.22,.9,.36,1)" }}
+        />
+        <defs>
+          <linearGradient id="gg" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stopColor="#A9862A" />
+            <stop offset="50%" stopColor="#D9B44A" />
+            <stop offset="100%" stopColor="#EED688" />
+          </linearGradient>
+        </defs>
+      </svg>
+      <div className="val">{score}<small>von {MAX} Punkten</small></div>
+    </div>
+  );
+}
+
+function Result({ answers, onRestart }) {
+  const { score, tier, weakest } = useMemo(() => {
+    const scored = answers.map((a, i) => ({
+      i,
+      dim: QUESTIONS[i].dim,
+      p: QUESTIONS[i].options[a].p,
+      quickWin: QUESTIONS[i].quickWin,
+    }));
+    const score = scored.reduce((s, x) => s + x.p, 0);
+    const weakest = [...scored].sort((a, b) => a.p - b.p).slice(0, 3)
+      .filter(x => x.p <= 1);
+    return { score, tier: tierFor(score), weakest };
+  }, [answers]);
+
+  const dims = weakest.map(w => w.dim);
+  const quickWins = (weakest.length ? weakest : [{ quickWin: {
+    title: "Halte das Niveau",
+    text: "Deine Basis stimmt. Prüfe einmal im Quartal mit diesem Check, ob sich alte Muster einschleichen – und gib pro Quartal einen weiteren Bereich vollständig ab.",
+  }}]).map(w => w.quickWin).slice(0, 3);
+
+  return (
+    <div className="screen">
+      <span className={"tier-badge " + tier.cls}>{tier.name}</span>
+      <h1 style={{ fontSize: "1.5rem" }}>Dein Ergebnis</h1>
+
+      <div className="score-row">
+        <ScoreRing score={score} />
+        <p className="analysis">
+          {tier.text}
+          {dims.length > 0 && (
+            <> Deine größten Hebel liegen aktuell bei: <b>{dims.join(", ")}</b>.</>
+          )}
+        </p>
+      </div>
+
+      <div className="qw-label">Deine Quick Wins für diese Woche</div>
+      {quickWins.map((qw, i) => (
+        <div className="qw" key={i}>
+          <h3><span>{String(i + 1).padStart(2, "0")}</span>{qw.title}</h3>
+          <p>{qw.text}</p>
+        </div>
+      ))}
+
+      <div className="cta-box">
+        <h2>Sprich Deine Ergebnisse durch</h2>
+        <p>
+          Bespreche Dein Ergebnis in einem kostenlosen 20-Minuten-Gespräch mit {CONFIG.host} –
+          und finde heraus, wo Du in Deinem Unternehmen sofort ansetzen kannst.
+        </p>
+        <a className="btn" href={CONFIG.ctaUrl} target="_blank" rel="noopener">
+          Kostenloses Gespräch sichern
+        </a>
+      </div>
+
+      <button className="restart" onClick={onRestart}>Check neu starten</button>
+    </div>
+  );
+}
+
+/* ============================================================
+   APP — all state lives here (React only, no storage/APIs).
+   ============================================================ */
+function App() {
+  const [phase, setPhase] = useState("start");        // start | quiz | result
+  const [current, setCurrent] = useState(0);
+  const [answers, setAnswers] = useState([]);         // option index per question
+  const [animKey, setAnimKey] = useState(0);
+
+  const select = (optIdx) => {
+    const next = [...answers];
+    next[current] = optIdx;
+    setAnswers(next);
+    // brief pause so the selection highlight is visible before sliding on
+    setTimeout(() => {
+      if (current + 1 < QUESTIONS.length) {
+        setCurrent(current + 1);
+        setAnimKey(k => k + 1);
+      } else {
+        setPhase("result");
+      }
+    }, 260);
+  };
+
+  const back = () => {
+    setCurrent(current - 1);
+    setAnimKey(k => k + 1);
+  };
+
+  const restart = () => {
+    setAnswers([]);
+    setCurrent(0);
+    setAnimKey(k => k + 1);
+    setPhase("start");
+  };
+
+  return (
+    <>
+      <div className="wrap">
+        <Brand />
+        {phase === "start" && <Start onStart={() => setPhase("quiz")} />}
+        {phase === "quiz" && (
+          <Question
+            index={current}
+            answer={answers[current]}
+            onSelect={select}
+            onBack={back}
+            animKey={animKey}
+          />
+        )}
+        {phase === "result" && <Result answers={answers} onRestart={restart} />}
+      </div>
+      <footer>
+        Basierend auf Folge <b>{CONFIG.episode}</b> des Podcasts <b>„{CONFIG.podcast}"</b>
+      </footer>
+    </>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+</script>
+</body>
+</html>
