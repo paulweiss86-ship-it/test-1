@@ -52,6 +52,13 @@ fully self-contained and works offline — just open it in any browser.
 - To adapt for another episode, edit only the `CONFIG` and `QUESTIONS`/`TIERS`
   objects at the top of the script; the UI, scoring and analysis derive from
   them.
+- Mobile: optimized for touch (56px targets, safe-area insets, dynamic
+  viewport height, no tap-highlight/zoom delay) and shows a static hint when
+  opened in a JS-less file preview (e.g. iPhone Files/Mail Quick Look).
+- `src/quiz-folge-1335.src.html` is the editable JSX source (uses CDN React
+  for development). The distributed `quiz-folge-1335.html` is built from it
+  by inlining React and precompiling the JSX — edit the source, then rebuild,
+  or edit the config objects directly in the built file.
 
 ### Theming
 
