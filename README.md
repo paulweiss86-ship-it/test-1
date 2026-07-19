@@ -33,7 +33,9 @@ delivered to listeners as a bonus asset (web page or printed/PDF handout).
 
 ### Theming
 
-All colors are defined as CSS variables in `:root`. The default theme uses the
-brand signal green (`#12BC05`) with anthracite and white. Special formats only
-need a different `--brand` / `--brand-dark` (examples are documented in the
-file's style section).
+All colors are defined as CSS variables in `:root`. The default theme matches
+the Rayk Hahne brand identity (based on screenshots of raykhahne.de):
+black/anthracite surfaces, a gold gradient (`#A9862A → #D9B44A → #EED688`) for
+accents, pill buttons and the RH monogram, white uppercase headlines, and light
+sections with soft white rounded cards. Special formats only need adjusted
+`--gold*` variables / `--grad` gradient.
