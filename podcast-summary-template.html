@@ -1,0 +1,706 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Folge 1335 – Warum Du als Unternehmer nicht alles allein tragen darfst. | Unternehmerwissen in 15 Minuten</title>
+
+<!-- ============================================================
+  UNTERNEHMERWISSEN – PODCAST BONUS-SHEET (Template)
+  ============================================================
+  How to use this template for a new episode:
+
+  1. Replace the episode data in the HEADER (number, title, date,
+     duration, format, shownotes link).
+  2. Fill each MODULE with content from the episode script.
+  3. Every <section class="module" ...> is self-contained:
+     delete any module that doesn't fit the episode — the layout
+     adapts automatically. Reorder modules by moving the blocks.
+  4. Optional modules are marked "OPTIONAL" (e.g. the guest
+     profile — remove it for solo episodes).
+  5. Theming: all colors live in the :root CSS variables below.
+     For special formats (e.g. interview specials, book episodes)
+     you only need to change --brand and --brand-dark.
+  6. The file is fully self-contained (no external fonts, images
+     or scripts) and print-optimized: "Print > Save as PDF"
+     produces a clean A4 handout.
+  ============================================================ -->
+
+<style>
+  /* ==========================================================
+     THEME — change brand colors here.
+     Default: Unternehmerwissen signal green.
+     Example alternative themes:
+       Interview-Special:  --brand:#0E86D4; --brand-dark:#0A649E;
+       Buch-Folge:         --brand:#E8A013; --brand-dark:#B57B0A;
+     ========================================================== */
+  :root {
+    --brand:       #12BC05;   /* signal green – Rayk Hahne brand accent */
+    --brand-dark:  #0C8A03;   /* darker green for text & hovers */
+    --brand-tint:  #EAF9E7;   /* light green surface */
+    --dark:        #10160F;   /* anthracite – header / footer */
+    --dark-2:      #1A231A;   /* raised surfaces on dark */
+    --ink:         #182018;   /* body text */
+    --muted:       #5E6B5E;   /* secondary text */
+    --line:        #E0E7DF;   /* hairlines */
+    --bg:          #F2F5F0;   /* page background */
+    --paper:       #FFFFFF;   /* sheet background */
+    --radius:      14px;
+    --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+            "Helvetica Neue", Arial, sans-serif;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { -webkit-text-size-adjust: 100%; }
+
+  body {
+    font-family: var(--font);
+    background: var(--bg);
+    color: var(--ink);
+    line-height: 1.6;
+    font-size: 16px;
+  }
+
+  .sheet {
+    max-width: 820px;
+    margin: 0 auto;
+    background: var(--paper);
+    min-height: 100vh;
+    box-shadow: 0 0 40px rgba(16, 22, 15, .08);
+  }
+
+  /* ==========================================================
+     HEADER
+     ========================================================== */
+  .head {
+    background: var(--dark);
+    color: #fff;
+    padding: 34px 44px 38px;
+    border-top: 6px solid var(--brand);
+    position: relative;
+    overflow: hidden;
+  }
+  /* subtle "track lines" motif – nod to the sports/training brand */
+  .head::after {
+    content: "";
+    position: absolute;
+    right: -60px; top: -40px;
+    width: 320px; height: 320px;
+    background: repeating-linear-gradient(
+      -55deg,
+      transparent 0 26px,
+      rgba(18, 188, 5, .10) 26px 32px
+    );
+    pointer-events: none;
+  }
+  .head > * { position: relative; z-index: 1; }
+
+  .brandbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 30px;
+  }
+  .wordmark {
+    font-weight: 800;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    font-size: .82rem;
+  }
+  .wordmark b { color: var(--brand); }
+  .bonus-tag {
+    font-size: .68rem;
+    font-weight: 700;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--dark);
+    background: var(--brand);
+    padding: 5px 12px;
+    border-radius: 100px;
+    white-space: nowrap;
+  }
+
+  .ep-number {
+    font-size: .95rem;
+    font-weight: 800;
+    letter-spacing: .22em;
+    text-transform: uppercase;
+    color: var(--brand);
+    margin-bottom: 10px;
+  }
+  .ep-title {
+    font-size: clamp(1.6rem, 4.2vw, 2.3rem);
+    font-weight: 800;
+    line-height: 1.18;
+    letter-spacing: -.01em;
+    max-width: 21em;
+  }
+  .ep-claim {
+    margin-top: 14px;
+    color: rgba(255,255,255,.72);
+    font-size: 1.02rem;
+    max-width: 34em;
+  }
+
+  .meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 26px;
+  }
+  .meta span {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    background: var(--dark-2);
+    border: 1px solid rgba(255,255,255,.10);
+    border-radius: 100px;
+    padding: 6px 14px;
+    font-size: .8rem;
+    font-weight: 600;
+    color: rgba(255,255,255,.85);
+  }
+  .meta .dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: var(--brand);
+    flex: none;
+  }
+  .meta a { color: var(--brand); text-decoration: none; }
+  .meta a:hover { text-decoration: underline; }
+
+  /* ==========================================================
+     MODULE BASICS
+     ========================================================== */
+  main { padding: 14px 44px 40px; }
+
+  .module { padding: 34px 0; border-bottom: 1px solid var(--line); }
+  .module:last-of-type { border-bottom: none; }
+
+  .m-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    font-size: .7rem;
+    font-weight: 800;
+    letter-spacing: .18em;
+    text-transform: uppercase;
+    color: var(--brand-dark);
+    margin-bottom: 14px;
+  }
+  .m-label::before {
+    content: "";
+    width: 22px; height: 3px;
+    background: var(--brand);
+    border-radius: 2px;
+  }
+  .m-title {
+    font-size: 1.45rem;
+    font-weight: 800;
+    letter-spacing: -.01em;
+    margin-bottom: 16px;
+  }
+  .module p { color: var(--ink); }
+  .module .lead { font-size: 1.05rem; }
+
+  /* ==========================================================
+     MODULE: KERNPUNKTE (3-point TL;DR)
+     ========================================================== */
+  .cards3 {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+    margin-top: 6px;
+  }
+  .card {
+    background: var(--bg);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 20px 18px;
+  }
+  .card .num {
+    display: inline-grid;
+    place-items: center;
+    width: 34px; height: 34px;
+    border-radius: 10px;
+    background: var(--dark);
+    color: var(--brand);
+    font-weight: 800;
+    font-size: 1rem;
+    margin-bottom: 12px;
+  }
+  .card h3 { font-size: 1rem; font-weight: 800; margin-bottom: 6px; }
+  .card p { font-size: .9rem; color: var(--muted); }
+
+  /* ==========================================================
+     MODULE: THEMEN / TIMESTAMPS
+     ========================================================== */
+  .chapters { list-style: none; margin-top: 4px; }
+  .chapters li {
+    display: flex;
+    align-items: baseline;
+    gap: 16px;
+    padding: 12px 0;
+    border-bottom: 1px dashed var(--line);
+  }
+  .chapters li:last-child { border-bottom: none; }
+  .ts {
+    flex: none;
+    font-variant-numeric: tabular-nums;
+    font-weight: 800;
+    font-size: .8rem;
+    color: var(--brand-dark);
+    background: var(--brand-tint);
+    border-radius: 8px;
+    padding: 3px 10px;
+    min-width: 58px;
+    text-align: center;
+  }
+  .chapters b { font-weight: 700; }
+  .chapters small { display: block; color: var(--muted); font-size: .88rem; }
+
+  /* ==========================================================
+     MODULE: GAST (OPTIONAL)
+     ========================================================== */
+  .guest {
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+    background: var(--bg);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 22px;
+  }
+  .avatar {
+    flex: none;
+    width: 64px; height: 64px;
+    border-radius: 50%;
+    background: var(--dark);
+    color: var(--brand);
+    display: grid;
+    place-items: center;
+    font-weight: 800;
+    font-size: 1.3rem;
+    letter-spacing: .02em;
+  }
+  .guest h3 { font-size: 1.1rem; font-weight: 800; }
+  .guest .role { color: var(--brand-dark); font-weight: 700; font-size: .85rem; margin-bottom: 8px; }
+  .guest p { font-size: .92rem; color: var(--muted); }
+  .guest .links { margin-top: 10px; font-size: .85rem; }
+  .guest .links a { color: var(--brand-dark); font-weight: 700; text-decoration: none; }
+  .guest .links a:hover { text-decoration: underline; }
+
+  /* ==========================================================
+     MODULE: ERKENNTNISSE (deep dive)
+     ========================================================== */
+  .insight {
+    border-left: 3px solid var(--brand);
+    padding: 4px 0 4px 20px;
+    margin-bottom: 22px;
+  }
+  .insight:last-child { margin-bottom: 0; }
+  .insight h3 { font-size: 1.05rem; font-weight: 800; margin-bottom: 6px; }
+  .insight h3 span {
+    color: var(--brand-dark);
+    font-variant-numeric: tabular-nums;
+    margin-right: 6px;
+  }
+  .insight p { font-size: .95rem; color: var(--ink); }
+
+  /* ==========================================================
+     MODULE: ZITAT
+     ========================================================== */
+  .quote {
+    background: var(--dark);
+    color: #fff;
+    border-radius: var(--radius);
+    padding: 30px 32px 26px;
+    position: relative;
+  }
+  .quote::before {
+    content: "\201E";
+    position: absolute;
+    top: -6px; left: 20px;
+    font-size: 5rem;
+    line-height: 1;
+    color: var(--brand);
+    font-weight: 800;
+  }
+  .quote blockquote {
+    font-size: 1.2rem;
+    font-weight: 700;
+    line-height: 1.45;
+    padding-left: 34px;
+  }
+  .quote cite {
+    display: block;
+    margin-top: 12px;
+    padding-left: 34px;
+    font-style: normal;
+    font-size: .85rem;
+    color: var(--brand);
+    font-weight: 700;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+  }
+
+  /* ==========================================================
+     MODULE: TRAININGSPLAN (action checklist)
+     ========================================================== */
+  .plan {
+    background: var(--brand-tint);
+    border: 1px solid #CBEBC4;
+    border-radius: var(--radius);
+    padding: 26px 26px 20px;
+  }
+  .plan .m-title { margin-bottom: 6px; }
+  .plan .sub { color: var(--muted); font-size: .92rem; margin-bottom: 16px; }
+  .todo { list-style: none; }
+  .todo li {
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+    padding: 11px 0;
+    border-top: 1px solid #D8EFD2;
+    font-size: .95rem;
+  }
+  .todo .box {
+    flex: none;
+    width: 20px; height: 20px;
+    margin-top: 2px;
+    border: 2px solid var(--brand-dark);
+    border-radius: 6px;
+    background: #fff;
+  }
+  .todo b { font-weight: 700; }
+  .todo small { display: block; color: var(--muted); }
+
+  /* ==========================================================
+     MODULE: RESSOURCEN
+     ========================================================== */
+  .resources { list-style: none; }
+  .resources li { padding: 9px 0; border-bottom: 1px dashed var(--line); font-size: .95rem; }
+  .resources li:last-child { border-bottom: none; }
+  .resources a { color: var(--brand-dark); font-weight: 700; text-decoration: none; }
+  .resources a:hover { text-decoration: underline; }
+  .resources .arrow { color: var(--brand); font-weight: 800; margin-right: 10px; }
+
+  /* ==========================================================
+     MODULE: CTA
+     ========================================================== */
+  .cta {
+    background: var(--dark);
+    color: #fff;
+    border-radius: var(--radius);
+    padding: 32px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .cta h2 { font-size: 1.3rem; font-weight: 800; margin-bottom: 6px; }
+  .cta p { color: rgba(255,255,255,.72); font-size: .92rem; max-width: 26em; }
+  .btn {
+    display: inline-block;
+    background: var(--brand);
+    color: var(--dark);
+    font-weight: 800;
+    font-size: .95rem;
+    padding: 14px 26px;
+    border-radius: 100px;
+    text-decoration: none;
+    white-space: nowrap;
+    transition: transform .12s ease;
+  }
+  .btn:hover { transform: translateY(-2px); }
+
+  /* ==========================================================
+     FOOTER
+     ========================================================== */
+  footer {
+    background: var(--dark);
+    color: rgba(255,255,255,.6);
+    padding: 26px 44px;
+    font-size: .8rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px 24px;
+    justify-content: space-between;
+    align-items: center;
+  }
+  footer .wordmark { font-size: .72rem; color: #fff; }
+  footer nav { display: flex; gap: 18px; flex-wrap: wrap; }
+  footer a { color: rgba(255,255,255,.75); text-decoration: none; font-weight: 600; }
+  footer a:hover { color: var(--brand); }
+
+  /* ==========================================================
+     RESPONSIVE
+     ========================================================== */
+  @media (max-width: 680px) {
+    .head { padding: 26px 22px 30px; }
+    main { padding: 6px 22px 30px; }
+    footer { padding: 22px; }
+    .cards3 { grid-template-columns: 1fr; }
+    .guest { flex-direction: column; }
+    .cta { flex-direction: column; align-items: flex-start; }
+  }
+
+  /* ==========================================================
+     PRINT (A4 handout / PDF export)
+     ========================================================== */
+  @media print {
+    body { background: #fff; }
+    .sheet { box-shadow: none; max-width: none; }
+    .head, .quote, .cta, footer {
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+    .module, .card, .quote, .plan, .cta, .guest { break-inside: avoid; }
+    a { text-decoration: none; }
+    @page { size: A4; margin: 12mm; }
+  }
+</style>
+</head>
+<body>
+<div class="sheet">
+
+  <!-- ========================================================
+       HEADER — episode data
+       ======================================================== -->
+  <header class="head">
+    <div class="brandbar">
+      <div class="wordmark">Rayk Hahne <b>·</b> Unternehmerwissen</div>
+      <div class="bonus-tag">Podcast-Bonus</div>
+    </div>
+
+    <div class="ep-number">Folge 1335</div>
+    <h1 class="ep-title">Warum Du als Unternehmer nicht alles allein tragen darfst.</h1>
+    <p class="ep-claim">Die wichtigsten Erkenntnisse der Folge – kompakt zum Nachlesen, Abhaken und Umsetzen. Wir starten sofort mit dem Training.</p>
+
+    <div class="meta">
+      <span><i class="dot"></i>17. Juli 2026</span>
+      <span><i class="dot"></i>15 Minuten</span>
+      <span><i class="dot"></i>Solofolge</span>
+      <span><i class="dot"></i><a href="https://raykhahne.de/1335">Shownotes: raykhahne.de/1335</a></span>
+    </div>
+  </header>
+
+  <main>
+
+    <!-- ======================================================
+         MODULE 01: DARUM GEHT'S (intro / hook)
+         ====================================================== -->
+    <section class="module" data-module="intro">
+      <div class="m-label">Modul 01 · Darum geht's</div>
+      <p class="lead">
+        Viele Unternehmer tragen ihr Unternehmen komplett allein: jede Entscheidung, jedes Risiko,
+        jedes Problem landet auf ihrem Tisch. In dieser Folge erfährst Du, warum genau das Dein
+        Wachstum bremst – und wie Du mit klarer Struktur, echten Sparringspartnern und konsequenter
+        Verantwortungsabgabe wieder Zeit für Familie, Freizeit und Fitness gewinnst.
+      </p>
+    </section>
+
+    <!-- ======================================================
+         MODULE 02: DIE 3 KERNPUNKTE (TL;DR)
+         ====================================================== -->
+    <section class="module" data-module="kernpunkte">
+      <div class="m-label">Modul 02 · Das Wichtigste in 3 Punkten</div>
+      <div class="cards3">
+        <div class="card">
+          <div class="num">1</div>
+          <h3>Allein tragen ist keine Stärke</h3>
+          <p>Wer alles selbst schultert, wird zum Engpass des eigenen Unternehmens – und zahlt mit Gesundheit und Familienzeit.</p>
+        </div>
+        <div class="card">
+          <div class="num">2</div>
+          <h3>Struktur schlägt Willenskraft</h3>
+          <p>Nicht fehlende Motivation stoppt die Umsetzung, sondern fehlende Systeme. Ein belastbares Vorgehen macht Erfolg wiederholbar.</p>
+        </div>
+        <div class="card">
+          <div class="num">3</div>
+          <h3>Sparring beschleunigt</h3>
+          <p>Der Blick von außen zeigt Dir Hebel, die Du selbst nicht siehst. Hole Dir gezielt Menschen an die Seite, die weiter sind als Du.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ======================================================
+         MODULE 03: THEMEN IM ÜBERBLICK (timestamps)
+         ====================================================== -->
+    <section class="module" data-module="kapitel">
+      <div class="m-label">Modul 03 · Themen im Überblick</div>
+      <ul class="chapters">
+        <li>
+          <span class="ts">00:00</span>
+          <div><b>Begrüßung &amp; Einstieg ins Training</b>
+          <small>Warum diese Folge für jeden Unternehmer relevant ist, der „das mache ich lieber selbst" denkt.</small></div>
+        </li>
+        <li>
+          <span class="ts">02:30</span>
+          <div><b>Der Preis des Alleintragens</b>
+          <small>Was es Dich wirklich kostet, wenn jede Entscheidung über Deinen Tisch geht.</small></div>
+        </li>
+        <li>
+          <span class="ts">06:10</span>
+          <div><b>Struktur &amp; klares Vorgehen</b>
+          <small>Warum es bei anderen „so einfach aussieht" – und welches System dahintersteckt.</small></div>
+        </li>
+        <li>
+          <span class="ts">10:20</span>
+          <div><b>Verantwortung richtig abgeben</b>
+          <small>Die drei Ebenen der Delegation: Aufgabe, Verantwortung, Ergebnis.</small></div>
+        </li>
+        <li>
+          <span class="ts">13:40</span>
+          <div><b>Dein nächster Schritt</b>
+          <small>Wie Du in 15 Minuten Deine größten Hebel identifizierst.</small></div>
+        </li>
+      </ul>
+    </section>
+
+    <!-- ======================================================
+         MODULE 04: GAST-PROFIL — OPTIONAL
+         Remove this whole <section> for solo episodes.
+         ====================================================== -->
+    <section class="module" data-module="gast">
+      <div class="m-label">Modul 04 · Zu Gast (optional)</div>
+      <div class="guest">
+        <div class="avatar">MM</div>
+        <div>
+          <h3>Max Mustermann</h3>
+          <div class="role">Gründer &amp; Geschäftsführer, Musterfirma GmbH</div>
+          <p>
+            Kurzes Profil des Gastes: Werdegang, Expertise und warum er/sie für dieses
+            Thema die richtige Gesprächspartnerin bzw. der richtige Gesprächspartner ist.
+            Zwei bis drei Sätze reichen.
+          </p>
+          <div class="links">
+            <a href="https://example.com">Website</a> &nbsp;·&nbsp;
+            <a href="https://linkedin.com">LinkedIn</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ======================================================
+         MODULE 05: DIE WICHTIGSTEN ERKENNTNISSE (deep dive)
+         Add or remove .insight blocks as needed.
+         ====================================================== -->
+    <section class="module" data-module="erkenntnisse">
+      <div class="m-label">Modul 05 · Die wichtigsten Erkenntnisse</div>
+
+      <div class="insight">
+        <h3><span>01</span>Du bist der Engpass, wenn alles über Dich läuft</h3>
+        <p>
+          Solange jede Freigabe, jede Kundenfrage und jedes Problem bei Dir landet, wächst Dein
+          Unternehmen maximal so schnell, wie Dein Kalender es zulässt. Der erste Schritt ist die
+          ehrliche Bestandsaufnahme: Welche Entscheidungen triffst Du heute, die ein gut
+          eingearbeiteter Mitarbeiter genauso gut treffen könnte?
+        </p>
+      </div>
+
+      <div class="insight">
+        <h3><span>02</span>Umsetzung scheitert an fehlender Struktur, nicht am Willen</h3>
+        <p>
+          Die meisten Unternehmer wollen umsetzen – ihnen fehlt das klare Vorgehen. Bei anderen
+          sieht es nur deshalb einfach aus, weil dort ein über Jahre aufgebautes, belastbares
+          System arbeitet. Kopiere nicht das Ergebnis, sondern baue Dir Schritt für Schritt die
+          Struktur dahinter auf.
+        </p>
+      </div>
+
+      <div class="insight">
+        <h3><span>03</span>Verantwortung abgeben heißt Ergebnisse übergeben</h3>
+        <p>
+          Echte Entlastung entsteht erst, wenn Du nicht nur Aufgaben delegierst, sondern die
+          Verantwortung für das Ergebnis. Definiere das Ziel, den Rahmen und die Messgröße –
+          und lass den Weg dorthin los.
+        </p>
+      </div>
+
+      <div class="insight">
+        <h3><span>04</span>Sparringspartner sind kein Luxus, sondern ein Hebel</h3>
+        <p>
+          Profisportler trainieren nie allein – jeder Weltmeister hat einen Trainer. Als
+          Unternehmer brauchst Du genauso Menschen, die Deine Situation von außen sehen und
+          Dir die größten Hebel zeigen, bevor Du Jahre in Umwege investierst.
+        </p>
+      </div>
+    </section>
+
+    <!-- ======================================================
+         MODULE 06: ZITAT DER FOLGE
+         ====================================================== -->
+    <section class="module" data-module="zitat">
+      <div class="quote">
+        <blockquote>
+          Dein Unternehmen soll Dir Freiheit geben – nicht Du dem Unternehmen Deine Freiheit opfern.
+        </blockquote>
+        <cite>Rayk Hahne · Folge 1335</cite>
+      </div>
+    </section>
+
+    <!-- ======================================================
+         MODULE 07: DEIN TRAININGSPLAN (action checklist)
+         ====================================================== -->
+    <section class="module" data-module="trainingsplan">
+      <div class="plan">
+        <div class="m-label">Modul 07 · Dein Trainingsplan</div>
+        <h2 class="m-title">Diese Woche umsetzen</h2>
+        <p class="sub">Drucke dieses Sheet aus und hake ab, was Du erledigt hast – wie im Training zählt nur die Wiederholung.</p>
+        <ul class="todo">
+          <li><span class="box"></span><div><b>Engpass-Liste schreiben:</b> Notiere 10 Entscheidungen der letzten Woche, die nur über Deinen Tisch gingen.<small>Zeitaufwand: 15 Minuten</small></div></li>
+          <li><span class="box"></span><div><b>Eine Verantwortung komplett übergeben:</b> Wähle einen Bereich, definiere Ziel und Messgröße, übergib das Ergebnis.<small>Zeitaufwand: 30 Minuten</small></div></li>
+          <li><span class="box"></span><div><b>Sparringspartner identifizieren:</b> Wer in Deinem Umfeld ist dort, wo Du hinwillst? Vereinbare ein Gespräch.<small>Zeitaufwand: 10 Minuten</small></div></li>
+          <li><span class="box"></span><div><b>Feste „Familien-/Fitness-Blöcke" eintragen:</b> Blocke zwei unverhandelbare Termine für Dich in Deinem Kalender.<small>Zeitaufwand: 5 Minuten</small></div></li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- ======================================================
+         MODULE 08: RESSOURCEN & LINKS
+         ====================================================== -->
+    <section class="module" data-module="ressourcen">
+      <div class="m-label">Modul 08 · Ressourcen aus der Folge</div>
+      <ul class="resources">
+        <li><span class="arrow">→</span><a href="https://raykhahne.de/1335">Komplette Shownotes zur Folge</a> – alle Links und Details</li>
+        <li><span class="arrow">→</span><a href="https://raykhahne.de/austausch">15-Minuten-Austausch buchen</a> – kostenfreies Strategiegespräch</li>
+        <li><span class="arrow">→</span>Buchtipp: <b>„Dein perfekter Unternehmertag"</b> von Rayk Hahne</li>
+        <li><span class="arrow">→</span><a href="https://podcast.raykhahne.de/podcast-archiv/">Podcast-Archiv</a> – alle bisherigen Folgen</li>
+      </ul>
+    </section>
+
+    <!-- ======================================================
+         MODULE 09: CALL-TO-ACTION
+         ====================================================== -->
+    <section class="module" data-module="cta">
+      <div class="cta">
+        <div>
+          <h2>Lass uns über Deine größten Hebel sprechen.</h2>
+          <p>15 Minuten, kostenfrei und ohne Umwege: Wir schauen gemeinsam auf Deine aktuelle Situation – und wo Du sofort ansetzen kannst.</p>
+        </div>
+        <a class="btn" href="https://raykhahne.de/austausch">Termin sichern →</a>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ========================================================
+       FOOTER
+       ======================================================== -->
+  <footer>
+    <div class="wordmark">Rayk Hahne <b>·</b> Unternehmerwissen in 15 Minuten</div>
+    <nav>
+      <a href="https://www.raykhahne.de">raykhahne.de</a>
+      <a href="https://podcast.raykhahne.de">Podcast</a>
+      <a href="https://open.spotify.com/show/2SGBpvJ4BcXQj0SCdmsXxf">Spotify</a>
+      <a href="https://podcasts.apple.com/de/podcast/id1164374242">Apple Podcasts</a>
+    </nav>
+  </footer>
+
+</div>
+</body>
+</html>
