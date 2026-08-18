@@ -1,0 +1,1737 @@
+<meta charset="utf-8">
+<title>Robert Force</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Sans+3:ital,wght@0,300..900;1,400..700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+
+<style>
+/* ============ TOKENS ============ */
+:root{
+  --bg:#F3F3F3;
+  --surface:#FFFFFF;
+  --surface-2:#FAFAFA;
+  --surface-3:#F3F6F9;
+  --border:#E1E4E8;
+  --border-strong:#C9CDD2;
+  --text:#181818;
+  --text-2:#54616E;
+  --text-3:#7C8794;
+  --brand:#0176D3;
+  --brand-hover:#014486;
+  --navy:#032D60;
+  --tint:#EAF5FE;
+  --tint-2:#D8EDFF;
+  --ok:#2E844A;
+  --ok-bg:#CDEFC4;
+  --warn:#A86403;
+  --warn-bg:#FEF3C7;
+  --err:#B60554;
+  --err-bg:#FEE9EA;
+  --neutral-bg:#ECEDEE;
+  --shadow:0 2px 4px rgba(3,45,96,.10),0 0 1px rgba(3,45,96,.16);
+  --shadow-lg:0 12px 32px rgba(3,45,96,.22);
+  --header:linear-gradient(180deg,#0176D3 0%,#014486 100%);
+  --radius:.25rem;
+  --track:#E5E5E5;
+  --focus:#0176D3;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#0A121C;
+    --surface:#141F2D;
+    --surface-2:#1A2735;
+    --surface-3:#1E2D3D;
+    --border:#2A3B4E;
+    --border-strong:#3A4E64;
+    --text:#E9EFF6;
+    --text-2:#A3B6C9;
+    --text-3:#7D93A8;
+    --brand:#57B4FF;
+    --brand-hover:#8ECDFF;
+    --navy:#001A38;
+    --tint:#132C43;
+    --tint-2:#17364F;
+    --ok:#79D18F;
+    --ok-bg:#123A22;
+    --warn:#F5BE5B;
+    --warn-bg:#3B2C08;
+    --err:#FF8FA8;
+    --err-bg:#43121F;
+    --neutral-bg:#22303F;
+    --shadow:0 2px 4px rgba(0,0,0,.4),0 0 1px rgba(0,0,0,.5);
+    --shadow-lg:0 12px 32px rgba(0,0,0,.55);
+    --header:linear-gradient(180deg,#01426F 0%,#001A38 100%);
+    --track:#26364A;
+    --focus:#57B4FF;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0A121C;--surface:#141F2D;--surface-2:#1A2735;--surface-3:#1E2D3D;
+  --border:#2A3B4E;--border-strong:#3A4E64;--text:#E9EFF6;--text-2:#A3B6C9;--text-3:#7D93A8;
+  --brand:#57B4FF;--brand-hover:#8ECDFF;--navy:#001A38;--tint:#132C43;--tint-2:#17364F;
+  --ok:#79D18F;--ok-bg:#123A22;--warn:#F5BE5B;--warn-bg:#3B2C08;--err:#FF8FA8;--err-bg:#43121F;
+  --neutral-bg:#22303F;--shadow:0 2px 4px rgba(0,0,0,.4),0 0 1px rgba(0,0,0,.5);
+  --shadow-lg:0 12px 32px rgba(0,0,0,.55);--header:linear-gradient(180deg,#01426F 0%,#001A38 100%);
+  --track:#26364A;--focus:#57B4FF;
+}
+
+/* object accent colours (fixed - white glyphs sit on them in both themes) */
+:root{
+  --o-home:#0176D3; --o-lead:#F88962; --o-contact:#A094ED; --o-account:#7F8DE1;
+  --o-opp:#FCB95B; --o-case:#F2CF5B; --o-task:#4BC076; --o-campaign:#F49756; --o-report:#3BA755;
+}
+
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0;background:var(--bg);color:var(--text);
+  font-family:"Source Sans 3","Salesforce Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;
+  font-size:15px;line-height:1.45;-webkit-font-smoothing:antialiased;
+}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer;background:none;border:0}
+a{color:var(--brand);text-decoration:none}
+a:hover{text-decoration:underline}
+:focus-visible{outline:2px solid var(--focus);outline-offset:2px;border-radius:2px}
+.mono{font-family:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace}
+.num{font-variant-numeric:tabular-nums}
+.sr{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+
+/* ============ GLOBAL HEADER ============ */
+.gh{
+  background:var(--header);color:#fff;display:flex;align-items:center;gap:.75rem;
+  padding:.5rem .75rem;position:sticky;top:0;z-index:60;
+  padding-top:max(.5rem,env(safe-area-inset-top));
+}
+.brand{display:flex;align-items:center;gap:.5rem;flex-shrink:0}
+.cloud{
+  width:44px;height:30px;background:#fff;border-radius:999px;position:relative;flex-shrink:0;
+  display:grid;place-items:center;box-shadow:0 1px 2px rgba(0,0,0,.2);
+}
+.cloud::before,.cloud::after{content:"";position:absolute;background:#fff;border-radius:50%}
+.cloud::before{width:19px;height:19px;top:-8px;left:7px}
+.cloud::after{width:14px;height:14px;top:-5px;left:22px}
+.cloud span{
+  position:relative;z-index:2;font-weight:900;font-style:italic;font-size:13px;color:var(--brand);
+  letter-spacing:-.04em;line-height:1
+}
+.wordmark{display:flex;flex-direction:column;line-height:1.05}
+.wordmark b{font-size:1.02rem;font-weight:700;letter-spacing:-.01em}
+.wordmark small{font-size:.68rem;opacity:.82;letter-spacing:.06em;text-transform:uppercase}
+.gh-search{flex:1;position:relative;min-width:0;max-width:640px}
+.gh-search input{
+  width:100%;height:34px;border-radius:var(--radius);border:1px solid rgba(255,255,255,.35);
+  background:rgba(255,255,255,.16);color:#fff;padding:0 .6rem 0 2.1rem;
+}
+.gh-search input::placeholder{color:rgba(255,255,255,.8)}
+.gh-search input:focus{background:#fff;color:var(--text);border-color:#fff;outline:none}
+.gh-search input:focus::placeholder{color:var(--text-3)}
+.gh-search .si{position:absolute;left:.55rem;top:50%;transform:translateY(-50%);width:16px;height:16px;fill:currentColor;opacity:.85;pointer-events:none}
+.gh-search input:focus + .si{color:var(--text-2)}
+.gh-actions{display:flex;align-items:center;gap:.15rem;flex-shrink:0}
+.ghbtn{
+  width:34px;height:34px;border-radius:var(--radius);display:grid;place-items:center;color:#fff;position:relative
+}
+.ghbtn:hover{background:rgba(255,255,255,.18)}
+.ghbtn svg{width:18px;height:18px;fill:currentColor}
+.ghbtn .dot{position:absolute;top:5px;right:5px;width:8px;height:8px;border-radius:50%;background:#FE5C4C;border:1.5px solid #0169BE}
+.avatar{
+  width:30px;height:30px;border-radius:50%;background:#FCB95B;color:#032D60;display:grid;place-items:center;
+  font-weight:700;font-size:.78rem;margin-left:.25rem;flex-shrink:0
+}
+/* search results dropdown */
+.sres{
+  position:absolute;top:calc(100% + 4px);left:0;right:0;background:var(--surface);color:var(--text);
+  border-radius:var(--radius);box-shadow:var(--shadow-lg);border:1px solid var(--border);
+  max-height:min(60vh,420px);overflow:auto;z-index:70
+}
+.sres b{display:block;padding:.4rem .75rem;font-size:.7rem;letter-spacing:.08em;text-transform:uppercase;color:var(--text-3);background:var(--surface-2);position:sticky;top:0}
+.sres button{display:flex;gap:.6rem;align-items:center;width:100%;text-align:left;padding:.5rem .75rem;border-bottom:1px solid var(--border)}
+.sres button:hover{background:var(--tint)}
+.sres .empty{padding:1rem .75rem;color:var(--text-2)}
+
+/* ============ APP NAV ============ */
+.appnav{
+  background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:stretch;
+  gap:0;padding:0 .75rem;position:sticky;top:47px;z-index:50;overflow-x:auto;scrollbar-width:none;box-shadow:var(--shadow)
+}
+.appnav::-webkit-scrollbar{display:none}
+.appname{display:flex;align-items:center;font-weight:700;padding-right:1rem;margin-right:.5rem;border-right:1px solid var(--border);white-space:nowrap;font-size:.95rem}
+.navitem{
+  padding:.7rem .7rem .55rem;font-size:.86rem;color:var(--text-2);white-space:nowrap;
+  border-bottom:3px solid transparent;font-weight:400
+}
+.navitem:hover{color:var(--brand);background:var(--surface-2)}
+.navitem[aria-current="page"]{color:var(--brand);border-bottom-color:var(--brand);font-weight:600}
+
+/* ============ PAGE SHELL ============ */
+main{padding:.75rem;max-width:1400px;margin:0 auto;padding-bottom:4rem}
+.pagehead{
+  background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
+  padding:.75rem 1rem;margin-bottom:.75rem;box-shadow:var(--shadow)
+}
+.ph-top{display:flex;align-items:center;gap:.75rem;flex-wrap:wrap}
+.ph-titles{flex:1;min-width:200px}
+.ph-eyebrow{font-size:.75rem;color:var(--text-2);letter-spacing:.04em}
+.ph-title{font-size:1.35rem;font-weight:600;margin:0;line-height:1.2;text-wrap:balance}
+.ph-actions{display:flex;gap:.4rem;flex-wrap:wrap}
+.icon{width:34px;height:34px;border-radius:var(--radius);display:grid;place-items:center;flex-shrink:0}
+.icon svg{width:20px;height:20px;fill:#fff}
+.icon.sm{width:24px;height:24px;border-radius:3px}
+.icon.sm svg{width:14px;height:14px}
+.icon.lg{width:44px;height:44px;border-radius:6px}
+.icon.lg svg{width:26px;height:26px}
+
+.btn{
+  border:1px solid var(--border-strong);background:var(--surface);color:var(--brand);
+  padding:.3rem .8rem;border-radius:var(--radius);font-size:.87rem;font-weight:600;white-space:nowrap;
+  display:inline-flex;align-items:center;gap:.35rem
+}
+.btn:hover{background:var(--surface-3)}
+.btn svg{width:14px;height:14px;fill:currentColor}
+.btn--brand{background:var(--brand);border-color:var(--brand);color:#fff}
+.btn--brand:hover{background:var(--brand-hover);border-color:var(--brand-hover)}
+.btn--ghost{border-color:transparent;background:transparent}
+.btn--ghost:hover{background:var(--surface-3)}
+.btn--sm{padding:.15rem .55rem;font-size:.8rem}
+
+/* highlights strip on record pages */
+.highlights{display:flex;gap:0;flex-wrap:wrap;margin-top:.85rem;border-top:1px solid var(--border);padding-top:.6rem}
+.hl{padding:0 1.25rem 0 0;margin-right:1.25rem;border-right:1px solid var(--border);min-width:0}
+.hl:last-child{border-right:0}
+.hl dt{font-size:.75rem;color:var(--text-2);margin-bottom:.1rem}
+.hl dd{margin:0;font-weight:600;font-size:.95rem}
+
+/* ============ CARDS ============ */
+.grid{display:grid;gap:.75rem}
+.g-3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.g-2{grid-template-columns:repeat(2,minmax(0,1fr))}
+.g-2-1{grid-template-columns:minmax(0,2fr) minmax(0,1fr)}
+.card{
+  background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
+  box-shadow:var(--shadow);overflow:hidden;display:flex;flex-direction:column
+}
+.card-h{
+  display:flex;align-items:center;gap:.5rem;padding:.6rem .85rem;border-bottom:1px solid var(--border)
+}
+.card-h h2,.card-h h3{margin:0;font-size:.95rem;font-weight:600;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.card-h .count{color:var(--text-2);font-weight:400;font-size:.85rem}
+.card-b{padding:.85rem;flex:1}
+.card-b.flush{padding:0}
+.card-f{padding:.45rem;border-top:1px solid var(--border);text-align:center;background:var(--surface-2)}
+.card-f button{font-size:.85rem;color:var(--brand);font-weight:600;width:100%;padding:.2rem}
+.card-f button:hover{text-decoration:underline}
+
+/* ============ KPI TILES ============ */
+.kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:.75rem;margin-bottom:.75rem}
+.kpi{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:.75rem .85rem;position:relative;overflow:hidden}
+.kpi::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--kpic,var(--brand))}
+.kpi dt{font-size:.76rem;color:var(--text-2);text-transform:uppercase;letter-spacing:.05em;margin-bottom:.15rem}
+.kpi dd{margin:0;font-size:1.6rem;font-weight:700;line-height:1.1;font-variant-numeric:tabular-nums}
+.kpi .delta{font-size:.78rem;font-weight:600;display:flex;align-items:center;gap:.25rem;margin-top:.15rem}
+.up{color:var(--ok)} .down{color:var(--err)} .flat{color:var(--text-3)}
+
+/* ============ TABLES ============ */
+.tblwrap{overflow-x:auto}
+table.tbl{width:100%;border-collapse:collapse;font-size:.87rem}
+.tbl th{
+  text-align:left;font-weight:600;color:var(--text-2);font-size:.78rem;text-transform:uppercase;letter-spacing:.04em;
+  padding:.5rem .75rem;border-bottom:1px solid var(--border);background:var(--surface-2);white-space:nowrap;position:sticky;top:0
+}
+.tbl th button{font:inherit;color:inherit;display:flex;align-items:center;gap:.25rem;text-transform:inherit;letter-spacing:inherit}
+.tbl th button:hover{color:var(--brand)}
+.tbl td{padding:.5rem .75rem;border-bottom:1px solid var(--border);vertical-align:middle;white-space:nowrap}
+.tbl tbody tr:hover{background:var(--tint)}
+.tbl tbody tr{cursor:pointer}
+.tbl .lnk{color:var(--brand);font-weight:600}
+.tbl tr:hover .lnk{text-decoration:underline}
+.cellflex{display:flex;align-items:center;gap:.45rem}
+.rowmenu{color:var(--text-2);padding:0 .25rem;border-radius:3px}
+.rowmenu:hover{background:var(--border);color:var(--brand)}
+
+/* list toolbar */
+.toolbar{display:flex;gap:.5rem;align-items:center;padding:.5rem .75rem;border-bottom:1px solid var(--border);flex-wrap:wrap;background:var(--surface-2)}
+.toolbar input[type="search"],.toolbar select{
+  height:30px;border:1px solid var(--border-strong);border-radius:var(--radius);background:var(--surface);padding:0 .5rem;font-size:.85rem
+}
+.toolbar input[type="search"]{flex:1;min-width:140px}
+.toolbar .spacer{flex:1}
+.rescount{font-size:.8rem;color:var(--text-2);white-space:nowrap}
+
+/* ============ PILLS / BADGES ============ */
+.pill{
+  display:inline-flex;align-items:center;gap:.3rem;padding:.08rem .55rem;border-radius:999px;
+  font-size:.75rem;font-weight:600;background:var(--neutral-bg);color:var(--text-2);white-space:nowrap;line-height:1.5
+}
+.pill::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor;flex-shrink:0}
+.pill.ok{background:var(--ok-bg);color:var(--ok)}
+.pill.warn{background:var(--warn-bg);color:var(--warn)}
+.pill.err{background:var(--err-bg);color:var(--err)}
+.pill.info{background:var(--tint-2);color:var(--brand-hover)}
+.pill.plain::before{display:none}
+
+/* ============ PATH (Salesforce-style stage chevrons) ============ */
+.path{display:flex;overflow-x:auto;scrollbar-width:none;gap:2px;padding:.1rem 0}
+.path::-webkit-scrollbar{display:none}
+.pstep{
+  position:relative;flex:1 0 auto;min-width:110px;background:var(--track);color:var(--text-2);
+  padding:.42rem .5rem .42rem 1.1rem;font-size:.8rem;font-weight:600;white-space:nowrap;text-align:center;
+  clip-path:polygon(0 0,calc(100% - 12px) 0,100% 50%,calc(100% - 12px) 100%,0 100%,12px 50%);
+}
+.pstep:first-child{clip-path:polygon(0 0,calc(100% - 12px) 0,100% 50%,calc(100% - 12px) 100%,0 100%);padding-left:.6rem;border-radius:3px 0 0 3px}
+.pstep:last-child{clip-path:polygon(0 0,100% 0,100% 100%,0 100%,12px 50%)}
+.pstep.done{background:var(--brand);color:#fff}
+.pstep.current{background:var(--navy);color:#fff}
+.pstep.lost{background:var(--err);color:#fff}
+.pstep:hover:not(.current){filter:brightness(.95)}
+
+/* ============ KANBAN ============ */
+.kanban{display:flex;gap:.6rem;overflow-x:auto;padding-bottom:.5rem;align-items:flex-start}
+.kcol{flex:0 0 250px;background:var(--surface-3);border-radius:var(--radius);border:1px solid var(--border);display:flex;flex-direction:column;max-height:70vh}
+.kcol.over{border-color:var(--brand);background:var(--tint);box-shadow:0 0 0 2px var(--brand) inset}
+.kcol-h{padding:.5rem .6rem;border-bottom:1px solid var(--border);position:sticky;top:0;background:inherit;border-radius:var(--radius) var(--radius) 0 0}
+.kcol-h .t{font-size:.72rem;text-transform:uppercase;letter-spacing:.06em;color:var(--text-2);font-weight:700}
+.kcol-h .v{font-size:.95rem;font-weight:700;font-variant-numeric:tabular-nums}
+.kcol-b{padding:.4rem;display:flex;flex-direction:column;gap:.4rem;overflow-y:auto;min-height:60px}
+.kcard{
+  background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--o-opp);border-radius:3px;
+  padding:.5rem .6rem;box-shadow:var(--shadow);cursor:grab;font-size:.83rem
+}
+.kcard:active{cursor:grabbing}
+.kcard.drag{opacity:.4}
+.kcard .n{font-weight:600;color:var(--brand);margin-bottom:.15rem;white-space:normal;line-height:1.25}
+.kcard .m{color:var(--text-2);font-size:.78rem;display:flex;justify-content:space-between;gap:.5rem;margin-top:.3rem}
+.kcard .amt{font-weight:700;color:var(--text);font-variant-numeric:tabular-nums}
+.khint{font-size:.8rem;color:var(--text-2);margin-bottom:.5rem}
+
+/* ============ TIMELINE / ACTIVITY ============ */
+.tl{list-style:none;margin:0;padding:0}
+.tl li{display:flex;gap:.6rem;padding:.6rem .85rem;border-bottom:1px solid var(--border)}
+.tl li:last-child{border-bottom:0}
+.tl .body{flex:1;min-width:0}
+.tl .who{font-weight:600}
+.tl .txt{color:var(--text-2);font-size:.86rem;line-height:1.4}
+.tl .when{font-size:.75rem;color:var(--text-3);margin-top:.15rem;white-space:nowrap}
+
+/* task checkbox rows */
+.tasks{list-style:none;margin:0;padding:0}
+.tasks li{display:flex;gap:.6rem;align-items:flex-start;padding:.55rem .85rem;border-bottom:1px solid var(--border)}
+.tasks li:last-child{border-bottom:0}
+.tasks input[type="checkbox"]{width:17px;height:17px;margin-top:.15rem;accent-color:var(--brand);flex-shrink:0;cursor:pointer}
+.tasks .s{flex:1;min-width:0}
+.tasks .s .t{font-weight:600;font-size:.88rem}
+.tasks .s .d{font-size:.78rem;color:var(--text-2)}
+.tasks li.done .t{text-decoration:line-through;color:var(--text-3)}
+.due-over{color:var(--err);font-weight:600}
+.due-today{color:var(--warn);font-weight:600}
+
+/* ============ DETAIL FIELDS ============ */
+.fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.1rem 1.5rem}
+.f{padding:.45rem 0;border-bottom:1px solid var(--border);min-width:0}
+.f dt{font-size:.76rem;color:var(--text-2);margin-bottom:.05rem}
+.f dd{margin:0;font-size:.9rem;font-weight:500;word-break:break-word}
+.f dd.empty{color:var(--text-3);font-style:italic;font-weight:400}
+
+/* ============ CHARTS ============ */
+.chart{width:100%;height:auto;display:block;overflow:visible}
+.chart text{font-family:inherit;font-size:11px;fill:var(--text-2)}
+.chart .lbl-v{fill:var(--text);font-weight:700;font-size:12px}
+.gridline{stroke:var(--border);stroke-width:1}
+.legend{display:flex;flex-wrap:wrap;gap:.35rem .9rem;margin-top:.6rem;font-size:.8rem;color:var(--text-2)}
+.legend span{display:flex;align-items:center;gap:.35rem}
+.legend i{width:10px;height:10px;border-radius:2px;display:block}
+
+/* meter bars */
+.meter{height:8px;border-radius:999px;background:var(--track);overflow:hidden}
+.meter>i{display:block;height:100%;background:var(--brand);border-radius:999px}
+
+/* ============ MODAL ============ */
+.backdrop{position:fixed;inset:0;background:rgba(3,45,96,.55);backdrop-filter:blur(2px);z-index:100;display:grid;place-items:center;padding:1rem;overflow-y:auto}
+.modal{background:var(--surface);border-radius:.35rem;box-shadow:var(--shadow-lg);width:min(620px,100%);max-height:88vh;display:flex;flex-direction:column;margin:auto}
+.modal-h{padding:.85rem 1rem;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:.6rem;background:var(--surface-2);border-radius:.35rem .35rem 0 0}
+.modal-h h2{margin:0;font-size:1.05rem;font-weight:600;flex:1}
+.modal-b{padding:1rem;overflow-y:auto}
+.modal-f{padding:.75rem 1rem;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:.5rem;background:var(--surface-2);border-radius:0 0 .35rem .35rem}
+.form{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.75rem}
+.form label{display:flex;flex-direction:column;gap:.2rem;font-size:.8rem;font-weight:600;color:var(--text-2);min-width:0}
+.form label.full{grid-column:1/-1}
+.form input,.form select,.form textarea{
+  border:1px solid var(--border-strong);border-radius:var(--radius);background:var(--surface);
+  padding:.35rem .5rem;font-size:.9rem;font-weight:400;color:var(--text);width:100%
+}
+.form input:focus,.form select:focus,.form textarea:focus{border-color:var(--brand);outline:none;box-shadow:0 0 0 1px var(--brand)}
+.form textarea{min-height:78px;resize:vertical;font-family:inherit}
+.req{color:var(--err)}
+
+/* ============ TOAST ============ */
+.toasts{position:fixed;left:50%;transform:translateX(-50%);bottom:1.25rem;z-index:200;display:flex;flex-direction:column;gap:.5rem;width:min(460px,calc(100% - 2rem))}
+.toast{
+  background:var(--ok);color:#fff;border-radius:var(--radius);padding:.6rem .85rem;box-shadow:var(--shadow-lg);
+  display:flex;align-items:center;gap:.55rem;font-size:.88rem;font-weight:600;animation:rise .22s ease-out
+}
+.toast.info{background:var(--navy)}
+.toast.warn{background:#8C4B02}
+.toast svg{width:16px;height:16px;fill:currentColor;flex-shrink:0}
+@keyframes rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+
+.empty-state{padding:2rem 1rem;text-align:center;color:var(--text-2)}
+.empty-state svg{width:38px;height:38px;fill:var(--text-3);opacity:.6;margin-bottom:.5rem}
+
+.demo-banner{
+  background:var(--tint);border:1px solid var(--tint-2);border-left:4px solid var(--brand);
+  border-radius:var(--radius);padding:.5rem .75rem;font-size:.83rem;color:var(--text-2);
+  margin-bottom:.75rem;display:flex;gap:.5rem;align-items:center;flex-wrap:wrap
+}
+.demo-banner strong{color:var(--text)}
+.demo-banner .spacer{flex:1}
+
+/* ============ RESPONSIVE ============ */
+@media (max-width:1080px){
+  .g-3{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .kpis{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .g-2-1{grid-template-columns:minmax(0,1fr)}
+}
+@media (max-width:720px){
+  body{font-size:14px}
+  .gh{gap:.4rem;padding:.4rem .5rem;padding-top:max(.4rem,env(safe-area-inset-top))}
+  .wordmark{display:none}
+  .appnav{top:43px;padding:0 .5rem}
+  .appname{display:none}
+  main{padding:.5rem;padding-bottom:3rem}
+  .g-3,.g-2,.kpis{grid-template-columns:minmax(0,1fr)}
+  .kpis{gap:.5rem}
+  .kpi dd{font-size:1.4rem}
+  .fields{grid-template-columns:minmax(0,1fr)}
+  .form{grid-template-columns:minmax(0,1fr)}
+  .ph-title{font-size:1.15rem}
+  .highlights{gap:.5rem 0}
+  .hl{border-right:0;padding-right:0;margin-right:0;flex:1 0 45%}
+  .kcol{flex:0 0 78vw;max-height:none}
+  .modal{max-height:94vh}
+  /* tables collapse into stacked cards */
+  .tbl thead{display:none}
+  .tbl,.tbl tbody,.tbl tr,.tbl td{display:block;width:100%}
+  .tbl tr{border-bottom:1px solid var(--border);padding:.55rem .75rem}
+  .tbl td{border:0;padding:.12rem 0;white-space:normal;display:flex;gap:.6rem;align-items:baseline}
+  .tbl td::before{
+    content:attr(data-l);flex:0 0 33%;font-size:.72rem;text-transform:uppercase;letter-spacing:.04em;
+    color:var(--text-3);font-weight:600
+  }
+  .tbl td[data-l=""]::before{display:none}
+  .tbl td:first-child{font-size:1rem;margin-bottom:.15rem}
+  .tbl td:first-child::before{display:none}
+  .tbl td:first-child .cellflex{gap:.5rem}
+  .toasts{bottom:.75rem}
+}
+@media (prefers-reduced-motion:reduce){
+  *{animation-duration:.01ms !important;transition-duration:.01ms !important}
+}
+@media print{.gh,.appnav,.ph-actions,.toolbar{display:none}}
+</style>
+
+<svg class="sr" aria-hidden="true"><defs>
+<symbol id="i-home" viewBox="0 0 24 24"><path d="M12 3 3 10v11h6v-6h6v6h6V10z"/></symbol>
+<symbol id="i-lead" viewBox="0 0 24 24"><path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8Zm0 2c-4.4 0-8 2.2-8 5v1h16v-1c0-2.8-3.6-5-8-5Z"/></symbol>
+<symbol id="i-contact" viewBox="0 0 24 24"><path d="M4 4h16a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1Zm6 5.5a2.5 2.5 0 1 0 5 0 2.5 2.5 0 0 0-5 0ZM8 17h9c0-2-2-3.2-4.5-3.2S8 15 8 17Z"/></symbol>
+<symbol id="i-account" viewBox="0 0 24 24"><path d="M4 21V6.2l7-2.8v3.2l7-2.2V21H4Zm3-3.4h2.2v-2.8H7v2.8Zm0-4.6h2.2v-2.8H7V13Zm0-4.6h2.2V5.6H7v2.8Zm6.8 9.2H16v-2.8h-2.2v2.8Zm0-4.6H16v-2.8h-2.2V13Z"/></symbol>
+<symbol id="i-opp" viewBox="0 0 24 24"><path d="M9 4h6a2 2 0 0 1 2 2v1h3a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2h3V6a2 2 0 0 1 2-2Zm0 3h6V6H9v1Zm2.2 4v1.1c-1 .2-1.7.9-1.7 1.8 0 1.2 1 1.7 2.2 2 .8.2 1 .4 1 .7 0 .3-.3.5-.9.5-.7 0-1.4-.2-2-.5l-.4 1.4c.5.3 1.2.5 1.8.5V19h1.4v-1.1c1.1-.2 1.8-.9 1.8-1.9 0-1.1-.8-1.7-2.2-2-.9-.2-1.1-.4-1.1-.7 0-.3.2-.5.8-.5.7 0 1.3.2 1.7.4l.4-1.4c-.4-.2-.9-.4-1.5-.4V11h-1.3Z"/></symbol>
+<symbol id="i-case" viewBox="0 0 24 24"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Zm0 4.2a5.8 5.8 0 0 1 3 .9l-2.2 2.2a2.8 2.8 0 0 0-1.6 0L9 7.1a5.8 5.8 0 0 1 3-.9ZM6.2 12c0-1.1.3-2.1.9-3l2.2 2.2a2.8 2.8 0 0 0 0 1.6L7.1 15a5.8 5.8 0 0 1-.9-3Zm5.8 5.8c-1.1 0-2.1-.3-3-.9l2.2-2.2a2.8 2.8 0 0 0 1.6 0l2.2 2.2c-.9.6-1.9.9-3 .9Zm4.9-2.8-2.2-2.2a2.8 2.8 0 0 0 0-1.6L16.9 9c.6.9.9 1.9.9 3s-.3 2.1-.9 3Z"/></symbol>
+<symbol id="i-task" viewBox="0 0 24 24"><path d="M5 3h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2Zm5.6 13.4 7-7-1.4-1.4-5.6 5.6-2.6-2.6-1.4 1.4 4 4Z"/></symbol>
+<symbol id="i-campaign" viewBox="0 0 24 24"><path d="M3 10v4a1 1 0 0 0 1 1h1.6l1.8 4.6h2.4L8.4 15H10l8 4.6V4.4L10 9H4a1 1 0 0 0-1 1Zm17-.6v5.2a2.9 2.9 0 0 0 0-5.2Z"/></symbol>
+<symbol id="i-report" viewBox="0 0 24 24"><path d="M3 20V10.5h4.2V20H3Zm6.9 0V4h4.2v16H9.9Zm6.9 0v-7h4.2v7h-4.2Z"/></symbol>
+<symbol id="i-search" viewBox="0 0 24 24"><path d="M10.2 3a7.2 7.2 0 0 1 5.7 11.6l4.7 4.8-1.5 1.5-4.7-4.8A7.2 7.2 0 1 1 10.2 3Zm0 2.2a5 5 0 1 0 0 10 5 5 0 0 0 0-10Z"/></symbol>
+<symbol id="i-bell" viewBox="0 0 24 24"><path d="M12 2a6 6 0 0 0-6 6v3.8L4 15v1.4h16V15l-2-3.2V8a6 6 0 0 0-6-6Zm0 20a2.6 2.6 0 0 0 2.6-2.4H9.4A2.6 2.6 0 0 0 12 22Z"/></symbol>
+<symbol id="i-plus" viewBox="0 0 24 24"><path d="M11 5h2v6h6v2h-6v6h-2v-6H5v-2h6z"/></symbol>
+<symbol id="i-phone" viewBox="0 0 24 24"><path d="M6.2 2h2.6l2 5-2.4 1.7a12.6 12.6 0 0 0 5 5L15 11.3l5 2v2.5a3 3 0 0 1-3 3A14.8 14.8 0 0 1 2.2 4.9a3 3 0 0 1 3-2.9Z"/></symbol>
+<symbol id="i-mail" viewBox="0 0 24 24"><path d="M3 5h18a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1Zm9 7.8 8.4-5.6H3.6L12 12.8Z"/></symbol>
+<symbol id="i-cal" viewBox="0 0 24 24"><path d="M7 2v2h10V2h2v2h2a1 1 0 0 1 1 1v16a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1h2V2h2Zm13 8H4v10h16V10Z"/></symbol>
+<symbol id="i-note" viewBox="0 0 24 24"><path d="M5 3h9l5 5v13a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1Zm8 1.6V9h4.4L13 4.6ZM7 12h10v1.6H7V12Zm0 3.4h10V17H7v-1.6Z"/></symbol>
+<symbol id="i-check" viewBox="0 0 24 24"><path d="M9.6 17.6 4 12l1.6-1.6 4 4 8.8-8.8L20 7.2z"/></symbol>
+<symbol id="i-refresh" viewBox="0 0 24 24"><path d="M12 5V2L8 6l4 4V7a5 5 0 1 1-5 5H5a7 7 0 1 0 7-7Z"/></symbol>
+<symbol id="i-close" viewBox="0 0 24 24"><path d="m12 10.6 5.3-5.3 1.4 1.4-5.3 5.3 5.3 5.3-1.4 1.4-5.3-5.3-5.3 5.3-1.4-1.4 5.3-5.3-5.3-5.3 1.4-1.4z"/></symbol>
+<symbol id="i-convert" viewBox="0 0 24 24"><path d="M4 7h11V4l5 4.5-5 4.5v-3H4V7Zm16 10H9v3l-5-4.5L9 11v3h11v3Z"/></symbol>
+<symbol id="i-moon" viewBox="0 0 24 24"><path d="M12.5 3a9 9 0 1 0 8.5 11.7A7.5 7.5 0 0 1 12.5 3Z"/></symbol>
+<symbol id="i-grid" viewBox="0 0 24 24"><path d="M4 4h6v6H4V4Zm10 0h6v6h-6V4ZM4 14h6v6H4v-6Zm10 0h6v6h-6v-6Z"/></symbol>
+<symbol id="i-list" viewBox="0 0 24 24"><path d="M3 5h18v2.4H3V5Zm0 5.8h18v2.4H3v-2.4ZM3 16.6h18V19H3v-2.4Z"/></symbol>
+</defs></svg>
+
+<header class="gh">
+  <div class="brand">
+    <span class="cloud" aria-hidden="true"><span>rf</span></span>
+    <span class="wordmark"><b>Robert Force</b><small>Exchange Cloud</small></span>
+  </div>
+
+  <div class="gh-search">
+    <label class="sr" for="gsearch">Search Robert Force</label>
+    <input id="gsearch" type="search" placeholder="Search students, families, placements..." autocomplete="off">
+    <svg class="si" aria-hidden="true"><use href="#i-search"/></svg>
+    <div id="sres" hidden></div>
+  </div>
+
+  <div class="gh-actions">
+    <button class="ghbtn" id="btn-new" title="New record" aria-label="Create new record"><svg><use href="#i-plus"/></svg></button>
+    <button class="ghbtn" id="btn-theme" title="Toggle dark mode" aria-label="Toggle dark mode"><svg><use href="#i-moon"/></svg></button>
+    <button class="ghbtn" id="btn-bell" title="Notifications" aria-label="Notifications"><svg><use href="#i-bell"/></svg><span class="dot" id="belldot"></span></button>
+    <span class="avatar" title="Robert Fischer - System Administrator">RF</span>
+  </div>
+</header>
+
+<nav class="appnav" aria-label="Primary">
+  <span class="appname">Exchange Programs</span>
+  <a class="navitem" href="#/home">Home</a>
+  <a class="navitem" href="#/leads">Leads</a>
+  <a class="navitem" href="#/accounts">Accounts</a>
+  <a class="navitem" href="#/contacts">Contacts</a>
+  <a class="navitem" href="#/opportunities">Placements</a>
+  <a class="navitem" href="#/tasks">Tasks</a>
+  <a class="navitem" href="#/cases">Cases</a>
+  <a class="navitem" href="#/campaigns">Campaigns</a>
+  <a class="navitem" href="#/reports">Reports</a>
+</nav>
+
+<main id="app" tabindex="-1"></main>
+<div id="modal-root"></div>
+<div class="toasts" id="toasts" aria-live="polite"></div>
+
+<script>
+"use strict";
+/* =========================================================================
+   ROBERT FORCE - Exchange Cloud
+   A self-contained CRM prototype. No backend: the "database" below is seeded
+   into localStorage on first run and every action writes back to it.
+   ========================================================================= */
+
+const DAY = 864e5;
+const iso = n => new Date(Date.now() + n * DAY).toISOString().slice(0, 10);
+const stamp = n => new Date(Date.now() + n * DAY).toISOString();
+
+const STAGES = ["Inquiry","Application Received","Interview","Family Matching","Visa & Documents","Placed"];
+const STAGE_PROB = {"Inquiry":10,"Application Received":25,"Interview":45,"Family Matching":65,"Visa & Documents":85,"Placed":100,"Withdrawn":0};
+const LEAD_STATUS = ["New","Working","Nurturing","Qualified","Unqualified"];
+const CASE_STATUS = ["New","In Progress","Waiting on Family","Escalated","Closed"];
+
+function seed() {
+  const accounts = [
+    {id:"a1",name:"Bangkok Bright Futures Academy",type:"Partner School",city:"Bangkok",country:"Thailand",phone:"+66 2 118 4420",website:"brightfutures.ac.th",owner:"Robert Fischer",rating:"Hot",seats:24,since:"2019"},
+    {id:"a2",name:"Chiang Mai International School",type:"Partner School",city:"Chiang Mai",country:"Thailand",phone:"+66 53 907 1180",website:"cmis-exchange.ac.th",owner:"Anong Petchara",rating:"Hot",seats:18,since:"2020"},
+    {id:"a3",name:"Familie Hoffmann",type:"Host Family",city:"Bremen",country:"Germany",phone:"+49 421 55 9012",website:"",owner:"Robert Fischer",rating:"Warm",seats:1,since:"2022"},
+    {id:"a4",name:"Familie Bergqvist",type:"Host Family",city:"Uppsala",country:"Sweden",phone:"+46 18 44 2277",website:"",owner:"Lena Brandt",rating:"Hot",seats:2,since:"2021"},
+    {id:"a5",name:"Sunrise Exchange Phuket",type:"Partner Agency",city:"Phuket",country:"Thailand",phone:"+66 76 231 8890",website:"sunrise-exchange.co.th",owner:"Anong Petchara",rating:"Warm",seats:12,since:"2023"},
+    {id:"a6",name:"O'Donnell Household",type:"Host Family",city:"Galway",country:"Ireland",phone:"+353 91 55 3341",website:"",owner:"Marco Keller",rating:"Warm",seats:1,since:"2024"},
+    {id:"a7",name:"Nakhon Language Institute",type:"Partner School",city:"Nakhon Ratchasima",country:"Thailand",phone:"+66 44 25 6612",website:"nakhon-lang.ac.th",owner:"Robert Fischer",rating:"Cold",seats:9,since:"2024"},
+    {id:"a8",name:"Famiglia Rossi",type:"Host Family",city:"Bologna",country:"Italy",phone:"+39 051 22 8890",website:"",owner:"Marco Keller",rating:"Hot",seats:2,since:"2022"},
+    {id:"a9",name:"Global Youth Bridge Foundation",type:"Sponsor",city:"Geneva",country:"Switzerland",phone:"+41 22 700 1145",website:"gyb-foundation.org",owner:"Lena Brandt",rating:"Hot",seats:40,since:"2018"},
+    {id:"a10",name:"Familie van Dijk",type:"Host Family",city:"Utrecht",country:"Netherlands",phone:"+31 30 233 7788",website:"",owner:"Lena Brandt",rating:"Warm",seats:1,since:"2023"},
+    {id:"a11",name:"Familie Lindqvist",type:"Host Family",city:"Aarhus",country:"Denmark",phone:"+45 86 12 4409",website:"",owner:"Marco Keller",rating:"Cold",seats:1,since:"2025"},
+    {id:"a12",name:"Maison Moreau",type:"Host Family",city:"Lyon",country:"France",phone:"+33 4 72 11 5566",website:"",owner:"Robert Fischer",rating:"Warm",seats:2,since:"2021"}
+  ];
+
+  const contacts = [
+    {id:"c1",name:"Chanidapa Srisuk",nick:"Nam",role:"Exchange Student",accountId:"a1",title:"Grade 11 / Science stream",email:"nam.srisuk@brightfutures.ac.th",phone:"+66 81 445 2201",city:"Bangkok",country:"Thailand",lang:"Thai, English (B2)",owner:"Robert Fischer"},
+    {id:"c2",name:"Kanya Wattana",nick:"Kay",role:"Exchange Student",accountId:"a1",title:"Grade 10 / Arts stream",email:"kanya.w@brightfutures.ac.th",phone:"+66 82 110 7745",city:"Bangkok",country:"Thailand",lang:"Thai, English (B1)",owner:"Robert Fischer"},
+    {id:"c3",name:"Ploychompoo Thongchai",nick:"Ploy",role:"Exchange Student",accountId:"a2",title:"Grade 11 / Language stream",email:"ploy.t@cmis-exchange.ac.th",phone:"+66 89 220 3312",city:"Chiang Mai",country:"Thailand",lang:"Thai, English (C1), German (A2)",owner:"Anong Petchara"},
+    {id:"c4",name:"Somchai Techapaiboon",nick:"Chai",role:"Exchange Student",accountId:"a2",title:"Grade 12 / Science stream",email:"somchai.t@cmis-exchange.ac.th",phone:"+66 84 771 9908",city:"Chiang Mai",country:"Thailand",lang:"Thai, English (B2)",owner:"Anong Petchara"},
+    {id:"c5",name:"Siriporn Nakhonchai",nick:"Ploy Jr.",role:"Exchange Student",accountId:"a7",title:"Grade 10 / General",email:"siriporn.n@nakhon-lang.ac.th",phone:"+66 88 342 1170",city:"Nakhon Ratchasima",country:"Thailand",lang:"Thai, English (B1)",owner:"Robert Fischer"},
+    {id:"c6",name:"Apinya Chaiyaporn",nick:"Aim",role:"Exchange Student",accountId:"a5",title:"Gap year programme",email:"apinya.c@sunrise-exchange.co.th",phone:"+66 87 991 4432",city:"Phuket",country:"Thailand",lang:"Thai, English (B2)",owner:"Anong Petchara"},
+    {id:"c7",name:"Nattaya Suwannee",nick:"Tan",role:"Exchange Student",accountId:"a1",title:"Grade 11 / Science stream",email:"nattaya.s@brightfutures.ac.th",phone:"+66 81 662 5540",city:"Bangkok",country:"Thailand",lang:"Thai, English (B2), Swedish (A1)",owner:"Lena Brandt"},
+    {id:"c8",name:"Krit Saetang",nick:"Krit",role:"Exchange Student",accountId:"a5",title:"Grade 12 / Business stream",email:"krit.s@sunrise-exchange.co.th",phone:"+66 86 003 1129",city:"Phuket",country:"Thailand",lang:"Thai, English (C1)",owner:"Marco Keller"},
+    {id:"c9",name:"Warunee Boonmee",nick:"Ploi",role:"Exchange Student",accountId:"a2",title:"Grade 10 / Arts stream",email:"warunee.b@cmis-exchange.ac.th",phone:"+66 83 447 2218",city:"Chiang Mai",country:"Thailand",lang:"Thai, English (B1), Italian (A1)",owner:"Marco Keller"},
+    {id:"c10",name:"Ingrid Hoffmann",role:"Host Parent",accountId:"a3",title:"Host mother",email:"i.hoffmann@mail.de",phone:"+49 421 55 9012",city:"Bremen",country:"Germany",lang:"German, English (B2)",owner:"Robert Fischer"},
+    {id:"c11",name:"Erik Bergqvist",role:"Host Parent",accountId:"a4",title:"Host father",email:"erik.bergqvist@mail.se",phone:"+46 18 44 2277",city:"Uppsala",country:"Sweden",lang:"Swedish, English (C1)",owner:"Lena Brandt"},
+    {id:"c12",name:"Seamus O'Donnell",role:"Host Parent",accountId:"a6",title:"Host father",email:"seamus.od@mail.ie",phone:"+353 91 55 3341",city:"Galway",country:"Ireland",lang:"English, Irish",owner:"Marco Keller"},
+    {id:"c13",name:"Giulia Rossi",role:"Host Parent",accountId:"a8",title:"Host mother",email:"g.rossi@mail.it",phone:"+39 051 22 8890",city:"Bologna",country:"Italy",lang:"Italian, English (B1)",owner:"Marco Keller"},
+    {id:"c14",name:"Sanne van Dijk",role:"Host Parent",accountId:"a10",title:"Host mother",email:"s.vandijk@mail.nl",phone:"+31 30 233 7788",city:"Utrecht",country:"Netherlands",lang:"Dutch, English (C1)",owner:"Lena Brandt"},
+    {id:"c15",name:"Anong Petchara",role:"School Coordinator",accountId:"a1",title:"Head of Outbound Programmes",email:"anong.p@brightfutures.ac.th",phone:"+66 2 118 4421",city:"Bangkok",country:"Thailand",lang:"Thai, English (C2)",owner:"Robert Fischer"},
+    {id:"c16",name:"Pichai Wong",role:"School Coordinator",accountId:"a2",title:"Exchange Office Lead",email:"pichai.w@cmis-exchange.ac.th",phone:"+66 53 907 1181",city:"Chiang Mai",country:"Thailand",lang:"Thai, English (C1)",owner:"Anong Petchara"},
+    {id:"c17",name:"Claire Moreau",role:"Host Parent",accountId:"a12",title:"Host mother",email:"c.moreau@mail.fr",phone:"+33 4 72 11 5566",city:"Lyon",country:"France",lang:"French, English (B2)",owner:"Robert Fischer"},
+    {id:"c18",name:"Dr. Marianne Keller",role:"Sponsor Contact",accountId:"a9",title:"Programme Director",email:"m.keller@gyb-foundation.org",phone:"+41 22 700 1146",city:"Geneva",country:"Switzerland",lang:"German, French, English",owner:"Lena Brandt"}
+  ];
+
+  const leads = [
+    {id:"l1",name:"Familie Wagner",contact:"Petra Wagner",title:"Prospective host family",status:"New",source:"Web Form",email:"p.wagner@mail.de",phone:"+49 89 22 4471",city:"Munich",country:"Germany",rating:"Warm",owner:"Robert Fischer",created:iso(-2),note:"Two teenagers, spare room, dog named Kanzler."},
+    {id:"l2",name:"Roong Thara School",contact:"Suda Kittikul",title:"Deputy Principal",status:"Working",source:"Partner Referral",email:"suda.k@roongthara.ac.th",phone:"+66 2 445 9910",city:"Bangkok",country:"Thailand",rating:"Hot",owner:"Anong Petchara",created:iso(-6),note:"Wants to send 8 students for the 2027 intake."},
+    {id:"l3",name:"Familie Novak",contact:"Tomas Novak",title:"Prospective host family",status:"Qualified",source:"Alumni Referral",email:"t.novak@mail.cz",phone:"+420 222 55 1188",city:"Prague",country:"Czechia",rating:"Hot",owner:"Lena Brandt",created:iso(-11),note:"Hosted with another agency in 2024, wants to switch to us."},
+    {id:"l4",name:"Hansen Family",contact:"Mette Hansen",title:"Prospective host family",status:"Nurturing",source:"Instagram Campaign",email:"mette.h@mail.dk",phone:"+45 33 22 7761",city:"Copenhagen",country:"Denmark",rating:"Warm",owner:"Marco Keller",created:iso(-19),note:"Interested, but not before the 2027 intake."},
+    {id:"l5",name:"Phang Nga Youth Club",contact:"Weera Sombat",title:"Programme Manager",status:"New",source:"Open House Bangkok",email:"weera.s@pnyouth.or.th",phone:"+66 76 441 2230",city:"Phang Nga",country:"Thailand",rating:"Warm",owner:"Anong Petchara",created:iso(-1),note:"Met at the Bangkok open house. Very organised, brought a spreadsheet."},
+    {id:"l6",name:"Familie Baumgartner",contact:"Urs Baumgartner",title:"Prospective host family",status:"Working",source:"Web Form",email:"u.baumgartner@mail.ch",phone:"+41 31 991 2244",city:"Bern",country:"Switzerland",rating:"Warm",owner:"Robert Fischer",created:iso(-8),note:"Asked eleven questions about liability insurance. Good sign."},
+    {id:"l7",name:"Kowalski Household",contact:"Ewa Kowalski",title:"Prospective host family",status:"Unqualified",source:"Instagram Campaign",email:"e.kowalski@mail.pl",phone:"+48 22 551 8890",city:"Warsaw",country:"Poland",rating:"Cold",owner:"Marco Keller",created:iso(-24),note:"Wanted an au pair, not an exchange student. Politely redirected."},
+    {id:"l8",name:"Surat Thani Academy",contact:"Nopadol Chaem",title:"Director",status:"Working",source:"Partner Referral",email:"nopadol.c@stacademy.ac.th",phone:"+66 77 220 6613",city:"Surat Thani",country:"Thailand",rating:"Hot",owner:"Robert Fischer",created:iso(-4),note:"Wants a co-branded info evening in October."},
+    {id:"l9",name:"Familie Fischer",contact:"Nils Fischer",title:"Prospective host family",status:"Qualified",source:"Alumni Referral",email:"n.fischer@mail.de",phone:"+49 30 887 4412",city:"Berlin",country:"Germany",rating:"Hot",owner:"Lena Brandt",created:iso(-13),note:"No relation to Robert. He asked. Twice."},
+    {id:"l10",name:"Bianchi Family",contact:"Luca Bianchi",title:"Prospective host family",status:"Nurturing",source:"Web Form",email:"l.bianchi@mail.it",phone:"+39 02 445 9021",city:"Milan",country:"Italy",rating:"Warm",owner:"Marco Keller",created:iso(-16),note:"Renovating the guest room until spring."}
+  ];
+
+  const opportunities = [
+    {id:"o1",name:"Nam Srisuk - Academic Year Germany 2026/27",accountId:"a3",contactId:"c1",stage:"Visa & Documents",amount:9800,close:iso(21),owner:"Robert Fischer",source:"Partner School",next:"Chase the consulate for the visa appointment slip."},
+    {id:"o2",name:"Kanya Wattana - Semester Sweden 2027",accountId:"a4",contactId:"c2",stage:"Family Matching",amount:6400,close:iso(46),owner:"Lena Brandt",source:"Partner School",next:"Second video call with the Bergqvists on Thursday."},
+    {id:"o3",name:"Ploy Thongchai - Academic Year Ireland 2026/27",accountId:"a6",contactId:"c3",stage:"Interview",amount:9200,close:iso(38),owner:"Marco Keller",source:"Partner School",next:"Language assessment scheduled."},
+    {id:"o4",name:"Somchai Techapaiboon - Semester Italy 2027",accountId:"a8",contactId:"c4",stage:"Application Received",amount:6100,close:iso(62),owner:"Marco Keller",source:"Open House Bangkok",next:"Missing two reference letters."},
+    {id:"o5",name:"Siriporn Nakhonchai - Academic Year Netherlands 2026/27",accountId:"a10",contactId:"c5",stage:"Inquiry",amount:8900,close:iso(75),owner:"Robert Fischer",source:"Web Form",next:"Send the programme brochure and fee schedule."},
+    {id:"o6",name:"Apinya Chaiyaporn - Gap Year France 2027",accountId:"a12",contactId:"c6",stage:"Family Matching",amount:11200,close:iso(33),owner:"Robert Fischer",source:"Agency Referral",next:"Moreau family wants a cooking-interests match. She bakes."},
+    {id:"o7",name:"Nattaya Suwannee - Academic Year Sweden 2026/27",accountId:"a4",contactId:"c7",stage:"Placed",amount:9600,close:iso(-9),owner:"Lena Brandt",source:"Partner School",next:"Arrival briefing done. Flight booked."},
+    {id:"o8",name:"Krit Saetang - Semester Denmark 2027",accountId:"a11",contactId:"c8",stage:"Interview",amount:6300,close:iso(41),owner:"Marco Keller",source:"Instagram Campaign",next:"Host family interview Monday 10:00."},
+    {id:"o9",name:"Warunee Boonmee - Academic Year Italy 2026/27",accountId:"a8",contactId:"c9",stage:"Visa & Documents",amount:9400,close:iso(17),owner:"Marco Keller",source:"Partner School",next:"Passport renewal in progress."},
+    {id:"o10",name:"Bright Futures - 2027 Cohort Agreement",accountId:"a1",contactId:"c15",stage:"Family Matching",amount:42000,close:iso(54),owner:"Robert Fischer",source:"Partner School",next:"Contract redlines back from their legal team."},
+    {id:"o11",name:"GYB Foundation - Scholarship Block 2027",accountId:"a9",contactId:"c18",stage:"Application Received",amount:60000,close:iso(88),owner:"Lena Brandt",source:"Sponsor",next:"Submit the impact report for last year's block."},
+    {id:"o12",name:"Chiang Mai IS - Summer Programme 2027",accountId:"a2",contactId:"c16",stage:"Inquiry",amount:18500,close:iso(96),owner:"Anong Petchara",source:"Partner School",next:"Scoping call to be booked."},
+    {id:"o13",name:"Sunrise Phuket - Gap Year Block 2027",accountId:"a5",contactId:"c6",stage:"Placed",amount:31000,close:iso(-22),owner:"Anong Petchara",source:"Agency Referral",next:"Signed. Invoice sent."},
+    {id:"o14",name:"Pim Charoenkul - Semester Germany 2027",accountId:"a3",contactId:"c2",stage:"Withdrawn",amount:6200,close:iso(-5),owner:"Robert Fischer",source:"Web Form",next:"Family withdrew - grandmother's health. Re-engage next intake."}
+  ];
+
+  const tasks = [
+    {id:"t1",subject:"Chase the German consulate about Nam's visa slot",due:iso(0),priority:"High",done:false,owner:"Robert Fischer",rel:{t:"opportunity",id:"o1"}},
+    {id:"t2",subject:"Explain to the Hoffmanns that 'a little spicy' is not a unit of measurement",due:iso(1),priority:"Normal",done:false,owner:"Robert Fischer",rel:{t:"account",id:"a3"}},
+    {id:"t3",subject:"Collect two missing reference letters from Somchai",due:iso(-2),priority:"High",done:false,owner:"Marco Keller",rel:{t:"opportunity",id:"o4"}},
+    {id:"t4",subject:"Second video call with the Bergqvist family",due:iso(2),priority:"Normal",done:false,owner:"Lena Brandt",rel:{t:"opportunity",id:"o2"}},
+    {id:"t5",subject:"Send the fee schedule to the Nakhonchai family",due:iso(3),priority:"Low",done:false,owner:"Robert Fischer",rel:{t:"opportunity",id:"o5"}},
+    {id:"t6",subject:"Book the language assessment for Ploy",due:iso(-1),priority:"High",done:false,owner:"Marco Keller",rel:{t:"opportunity",id:"o3"}},
+    {id:"t7",subject:"Prepare the impact report for the GYB Foundation",due:iso(6),priority:"High",done:false,owner:"Lena Brandt",rel:{t:"opportunity",id:"o11"}},
+    {id:"t8",subject:"Call Petra Wagner about the spare room and the dog",due:iso(0),priority:"Normal",done:false,owner:"Robert Fischer",rel:{t:"lead",id:"l1"}},
+    {id:"t9",subject:"Ship the arrival welcome pack to Uppsala",due:iso(4),priority:"Normal",done:false,owner:"Lena Brandt",rel:{t:"opportunity",id:"o7"}},
+    {id:"t10",subject:"Redline review with Bright Futures legal",due:iso(5),priority:"High",done:false,owner:"Robert Fischer",rel:{t:"opportunity",id:"o10"}},
+    {id:"t11",subject:"Confirm the October info evening in Surat Thani",due:iso(8),priority:"Normal",done:false,owner:"Robert Fischer",rel:{t:"lead",id:"l8"}},
+    {id:"t12",subject:"Log the Bangkok open house attendee list",due:iso(-4),priority:"Low",done:true,owner:"Anong Petchara",rel:{t:"campaign",id:"cm1"}},
+    {id:"t13",subject:"Send host family handbook v4 to all active families",due:iso(-6),priority:"Normal",done:true,owner:"Marco Keller",rel:{t:"campaign",id:"cm2"}},
+    {id:"t14",subject:"Order 200 more branded tote bags",due:iso(9),priority:"Low",done:false,owner:"Lena Brandt",rel:{t:"campaign",id:"cm4"}}
+  ];
+
+  const cases = [
+    {id:"cs1",num:"00001042",subject:"Host family cat has formally occupied the student's bed",status:"In Progress",priority:"Low",contactId:"c10",accountId:"a3",origin:"Phone",created:stamp(-1),desc:"Ingrid reports that Muffin (cat, 9kg) sleeps on the guest bed and will not be moved. Student says she is 'honoured'. Suggested a second blanket and a formal treaty."},
+    {id:"cs2",num:"00001041",subject:"Visa appointment rescheduled by the consulate",status:"Escalated",priority:"High",contactId:"c15",accountId:"a1",origin:"Email",created:stamp(-2),desc:"Consulate moved Nam's biometrics appointment by three weeks, which lands after the programme start date. Need an expedited slot or a deferred arrival."},
+    {id:"cs3",num:"00001040",subject:"Student packed 6kg of instant noodles and no winter coat",status:"In Progress",priority:"Normal",contactId:"c11",accountId:"a4",origin:"Phone",created:stamp(-3),desc:"Erik sent a photo of the unpacked suitcase. Coat organised locally, noodles declared strategic reserve."},
+    {id:"cs4",num:"00001039",subject:"Host father's curry attempt requires diplomatic follow-up",status:"Closed",priority:"Low",contactId:"c12",accountId:"a6",origin:"Web",created:stamp(-6),desc:"Seamus made a 'Thai-style' curry with 400g of cream. Student ate all of it out of politeness. Recipe card sent to the family."},
+    {id:"cs5",num:"00001038",subject:"School timetable clash - student assigned to two classes at once",status:"Waiting on Family",priority:"High",contactId:"c13",accountId:"a8",origin:"Email",created:stamp(-4),desc:"Bologna school placed Warunee in both Latin and Art for period 4. Waiting on the school office to resolve."},
+    {id:"cs6",num:"00001037",subject:"Homesickness check-in requested in week three",status:"New",priority:"Normal",contactId:"c14",accountId:"a10",origin:"Web",created:stamp(0),desc:"Standard week-three wobble. Sanne asked for a counsellor call and a list of Thai grocery shops in Utrecht."},
+    {id:"cs7",num:"00001036",subject:"Insurance certificate not received by host family",status:"In Progress",priority:"High",contactId:"c17",accountId:"a12",origin:"Phone",created:stamp(-2),desc:"Moreau family cannot complete the school registration without the insurance PDF. Reissue requested from the broker."},
+    {id:"cs8",num:"00001035",subject:"Airport pickup: two families arrived for the same student",status:"Closed",priority:"Normal",contactId:"c11",accountId:"a4",origin:"Phone",created:stamp(-9),desc:"Both the host family and their neighbours drove to Arlanda. Student got a very warm welcome and two bunches of flowers."}
+  ];
+
+  const campaigns = [
+    {id:"cm1",name:"Open House Bangkok - September",type:"Event",status:"Completed",budget:12000,cost:11350,leads:64,converted:19,start:iso(-45),end:iso(-43),owner:"Anong Petchara"},
+    {id:"cm2",name:"Host Family Recruitment - Europe Q3",type:"Direct Mail",status:"In Progress",budget:18000,cost:9800,leads:112,converted:23,start:iso(-30),end:iso(20),owner:"Marco Keller"},
+    {id:"cm3",name:"Alumni Referral Programme 2026",type:"Referral",status:"In Progress",budget:6000,cost:2400,leads:38,converted:17,start:iso(-90),end:iso(120),owner:"Lena Brandt"},
+    {id:"cm4",name:"Instagram: A Year That Changes You",type:"Social",status:"In Progress",budget:9500,cost:7100,leads:184,converted:12,start:iso(-21),end:iso(9),owner:"Lena Brandt"},
+    {id:"cm5",name:"Partner School Roadshow - Northern Thailand",type:"Event",status:"Planned",budget:15000,cost:0,leads:0,converted:0,start:iso(25),end:iso(32),owner:"Robert Fischer"}
+  ];
+
+  const activities = [
+    {id:"ac1",type:"call",who:"Robert Fischer",text:"Called the consulate hotline. Held for 41 minutes, listened to the entire panpipe catalogue, got a callback promise for Thursday.",when:stamp(-0.2),rel:{t:"opportunity",id:"o1"}},
+    {id:"ac2",type:"note",who:"Lena Brandt",text:"Bergqvist family has already knitted the student a hat. Student arrives in August. It is 26 degrees in August.",when:stamp(-0.5),rel:{t:"opportunity",id:"o2"}},
+    {id:"ac3",type:"email",who:"Marco Keller",text:"Sent the language assessment invite to Ploy plus the practice test. She replied in four minutes with the test already done.",when:stamp(-1.1),rel:{t:"opportunity",id:"o3"}},
+    {id:"ac4",type:"meeting",who:"Robert Fischer",text:"Redline call with Bright Futures legal. Two clauses left: cancellation window and who pays for lost passports.",when:stamp(-1.4),rel:{t:"opportunity",id:"o10"}},
+    {id:"ac5",type:"note",who:"Anong Petchara",text:"Open house attendance was 64 against a target of 40. We ran out of chairs, brochures and, briefly, oxygen.",when:stamp(-2.2),rel:{t:"campaign",id:"cm1"}},
+    {id:"ac6",type:"call",who:"Marco Keller",text:"Ten-minute call with Giulia Rossi about the timetable clash. She has offered to go to the school office in person, which usually works.",when:stamp(-2.6),rel:{t:"case",id:"cs5"}},
+    {id:"ac7",type:"email",who:"Lena Brandt",text:"Welcome pack tracking number sent to Uppsala. Includes the handbook, the SIM card and a Thai-Swedish phrasebook nobody will open.",when:stamp(-3.1),rel:{t:"opportunity",id:"o7"}},
+    {id:"ac8",type:"note",who:"Robert Fischer",text:"Petra Wagner's dog is called Kanzler. Noting this because it will come up in every future conversation with this family.",when:stamp(-3.5),rel:{t:"lead",id:"l1"}},
+    {id:"ac9",type:"meeting",who:"Anong Petchara",text:"Site visit at Nakhon Language Institute. Facilities good, English level mixed, coordinator extremely keen.",when:stamp(-4.3),rel:{t:"account",id:"a7"}},
+    {id:"ac10",type:"call",who:"Robert Fischer",text:"Ingrid Hoffmann called about the cat situation. We have agreed the cat has squatter's rights and the student gets a second pillow.",when:stamp(-1.0),rel:{t:"case",id:"cs1"}},
+    {id:"ac11",type:"email",who:"Lena Brandt",text:"Impact report outline sent to Dr. Keller at GYB. She wants placement retention numbers broken out by country.",when:stamp(-5.2),rel:{t:"opportunity",id:"o11"}},
+    {id:"ac12",type:"note",who:"Marco Keller",text:"Krit's host family interview moved to Monday. He asked whether Denmark has 'real winter'. It does.",when:stamp(-6.1),rel:{t:"opportunity",id:"o8"}}
+  ];
+
+  return {accounts,contacts,leads,opportunities,tasks,cases,campaigns,activities,seq:100};
+}
+</script>
+
+<script>
+"use strict";
+/* ========================= STORE ========================= */
+const KEY = "robertforce.db.v1";
+let DB;            // declared first: load() writes through save() during boot
+DB = load();
+
+function load(){
+  try{
+    const raw = localStorage.getItem(KEY);
+    if(raw){ const d = JSON.parse(raw); if(d && d.accounts) return d; }
+  }catch(e){ /* private mode or corrupt payload - fall through to seed */ }
+  const d = seed();
+  save(d);
+  return d;
+}
+function save(d){
+  DB = d || DB;
+  try{ localStorage.setItem(KEY, JSON.stringify(DB)); }
+  catch(e){ /* storage unavailable: the demo still runs from memory */ }
+}
+function resetDB(){
+  try{ localStorage.removeItem(KEY); }catch(e){}
+  DB = seed(); save();
+  toast("Demo data reset to factory settings", "info");
+  render();
+}
+const nextId = p => p + (++DB.seq);
+
+/* ========================= HELPERS ========================= */
+const $  = (s,r) => (r||document).querySelector(s);
+const $$ = (s,r) => Array.from((r||document).querySelectorAll(s));
+const esc = s => String(s == null ? "" : s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const money = n => new Intl.NumberFormat("en-GB",{style:"currency",currency:"EUR",maximumFractionDigits:0}).format(n||0);
+const moneyShort = n => n >= 1000 ? "EUR " + Math.round(n/1000) + "k" : "EUR " + (n||0);
+const dfmt = d => d ? new Date(d).toLocaleDateString("en-GB",{day:"2-digit",month:"short",year:"numeric"}) : "";
+const initials = n => String(n||"?").split(/\s+/).slice(0,2).map(w=>w[0]).join("").toUpperCase();
+const daysTo = d => Math.round((new Date(d+"T00:00:00") - new Date(new Date().toDateString())) / DAY);
+
+function ago(when){
+  const s = (Date.now() - new Date(when)) / 1000;
+  if (s < 60) return "just now";
+  if (s < 3600) return Math.floor(s/60) + "m ago";
+  if (s < 86400) return Math.floor(s/3600) + "h ago";
+  const d = Math.floor(s/86400);
+  return d === 1 ? "yesterday" : d + " days ago";
+}
+function dueLabel(d){
+  const n = daysTo(d);
+  if (n < 0)  return '<span class="due-over">Overdue by ' + Math.abs(n) + 'd</span>';
+  if (n === 0) return '<span class="due-today">Due today</span>';
+  if (n === 1) return "Due tomorrow";
+  return "Due in " + n + " days";
+}
+
+const byId = (arr,id) => arr.find(x => x.id === id);
+const account = id => byId(DB.accounts,id);
+const contact = id => byId(DB.contacts,id);
+
+/* ========================= OBJECT METADATA ========================= */
+const OBJ = {
+  leads:{
+    key:"leads", label:"Leads", one:"Lead", icon:"i-lead", color:"var(--o-lead)",
+    title:r => r.name, sub:r => r.contact + " - " + r.title,
+    columns:[
+      {k:"name",l:"Company / Family",link:true},
+      {k:"contact",l:"Primary Contact"},
+      {k:"status",l:"Status",pill:r => leadPill(r.status)},
+      {k:"source",l:"Source"},
+      {k:"city",l:"City"},
+      {k:"rating",l:"Rating",pill:r => ratingPill(r.rating)},
+      {k:"owner",l:"Owner"}
+    ],
+    filters:[{k:"status",l:"Status",opts:LEAD_STATUS},{k:"rating",l:"Rating",opts:["Hot","Warm","Cold"]},{k:"source",l:"Source"}],
+    form:[
+      {k:"name",l:"Company / Family",req:true},{k:"contact",l:"Primary Contact",req:true},
+      {k:"title",l:"Title"},{k:"status",l:"Status",opts:LEAD_STATUS},
+      {k:"email",l:"Email",type:"email"},{k:"phone",l:"Phone"},
+      {k:"city",l:"City"},{k:"country",l:"Country"},
+      {k:"source",l:"Source",opts:["Web Form","Partner Referral","Alumni Referral","Instagram Campaign","Open House Bangkok","Other"]},
+      {k:"rating",l:"Rating",opts:["Hot","Warm","Cold"]},
+      {k:"owner",l:"Owner",opts:OWNERS()},{k:"note",l:"Notes",type:"textarea",full:true}
+    ],
+    highlights:r => [["Status",r.status],["Rating",r.rating],["Source",r.source],["Created",dfmt(r.created)]]
+  },
+  accounts:{
+    key:"accounts", label:"Accounts", one:"Account", icon:"i-account", color:"var(--o-account)",
+    title:r => r.name, sub:r => r.type + " - " + r.city + ", " + r.country,
+    columns:[
+      {k:"name",l:"Account Name",link:true},
+      {k:"type",l:"Type",pill:r => '<span class="pill plain info">'+esc(r.type)+'</span>'},
+      {k:"city",l:"City"},{k:"country",l:"Country"},{k:"phone",l:"Phone"},
+      {k:"rating",l:"Rating",pill:r => ratingPill(r.rating)},{k:"owner",l:"Owner"}
+    ],
+    filters:[{k:"type",l:"Type"},{k:"country",l:"Country"},{k:"rating",l:"Rating",opts:["Hot","Warm","Cold"]}],
+    form:[
+      {k:"name",l:"Account Name",req:true},
+      {k:"type",l:"Type",opts:["Partner School","Host Family","Partner Agency","Sponsor"]},
+      {k:"city",l:"City"},{k:"country",l:"Country"},{k:"phone",l:"Phone"},{k:"website",l:"Website"},
+      {k:"seats",l:"Capacity (students)",type:"number"},{k:"rating",l:"Rating",opts:["Hot","Warm","Cold"]},
+      {k:"since",l:"Partner Since"},{k:"owner",l:"Owner",opts:OWNERS()}
+    ],
+    highlights:r => [["Type",r.type],["Capacity",r.seats + " students"],["Partner since",r.since],["Owner",r.owner]]
+  },
+  contacts:{
+    key:"contacts", label:"Contacts", one:"Contact", icon:"i-contact", color:"var(--o-contact)",
+    title:r => r.name + (r.nick ? ' ("' + r.nick + '")' : ""), sub:r => r.title,
+    columns:[
+      {k:"name",l:"Name",link:true},
+      {k:"role",l:"Role",pill:r => '<span class="pill plain '+(r.role==="Exchange Student"?"info":"")+'">'+esc(r.role)+'</span>'},
+      {k:"accountId",l:"Account",fmt:r => esc((account(r.accountId)||{}).name || "-")},
+      {k:"email",l:"Email"},{k:"phone",l:"Phone"},{k:"city",l:"City"},{k:"owner",l:"Owner"}
+    ],
+    filters:[{k:"role",l:"Role"},{k:"country",l:"Country"},{k:"owner",l:"Owner"}],
+    form:[
+      {k:"name",l:"Full Name",req:true},{k:"nick",l:"Nickname"},
+      {k:"role",l:"Role",opts:["Exchange Student","Host Parent","School Coordinator","Sponsor Contact"]},
+      {k:"accountId",l:"Account",ref:"accounts"},
+      {k:"title",l:"Title / Year Group"},{k:"email",l:"Email",type:"email"},{k:"phone",l:"Phone"},
+      {k:"city",l:"City"},{k:"country",l:"Country"},{k:"lang",l:"Languages"},{k:"owner",l:"Owner",opts:OWNERS()}
+    ],
+    highlights:r => [["Role",r.role],["Account",(account(r.accountId)||{}).name||"-"],["Languages",r.lang||"-"],["Owner",r.owner]]
+  },
+  opportunities:{
+    key:"opportunities", label:"Placements", one:"Placement", icon:"i-opp", color:"var(--o-opp)",
+    title:r => r.name, sub:r => (account(r.accountId)||{}).name || "",
+    columns:[
+      {k:"name",l:"Placement",link:true},
+      {k:"accountId",l:"Account",fmt:r => esc((account(r.accountId)||{}).name||"-")},
+      {k:"stage",l:"Stage",pill:r => stagePill(r.stage)},
+      {k:"amount",l:"Programme Fee",fmt:r => '<span class="num">'+money(r.amount)+'</span>',right:true},
+      {k:"close",l:"Close Date",fmt:r => dfmt(r.close)},
+      {k:"owner",l:"Owner"}
+    ],
+    filters:[{k:"stage",l:"Stage",opts:STAGES.concat(["Withdrawn"])},{k:"owner",l:"Owner"},{k:"source",l:"Source"}],
+    form:[
+      {k:"name",l:"Placement Name",req:true},{k:"accountId",l:"Account",ref:"accounts",req:true},
+      {k:"contactId",l:"Student / Contact",ref:"contacts"},
+      {k:"stage",l:"Stage",opts:STAGES.concat(["Withdrawn"])},
+      {k:"amount",l:"Programme Fee (EUR)",type:"number"},{k:"close",l:"Close Date",type:"date"},
+      {k:"source",l:"Source",opts:["Partner School","Agency Referral","Web Form","Sponsor","Open House Bangkok","Instagram Campaign"]},
+      {k:"owner",l:"Owner",opts:OWNERS()},{k:"next",l:"Next Step",type:"textarea",full:true}
+    ],
+    highlights:r => [["Programme fee",money(r.amount)],["Close date",dfmt(r.close)],["Stage",r.stage],["Probability",(STAGE_PROB[r.stage]||0)+"%"]]
+  },
+  cases:{
+    key:"cases", label:"Cases", one:"Case", icon:"i-case", color:"var(--o-case)",
+    title:r => r.subject, sub:r => "Case " + r.num,
+    columns:[
+      {k:"num",l:"Case Number",link:true,fmt:r => '<span class="mono">'+esc(r.num)+'</span>'},
+      {k:"subject",l:"Subject"},
+      {k:"status",l:"Status",pill:r => casePill(r.status)},
+      {k:"priority",l:"Priority",pill:r => prioPill(r.priority)},
+      {k:"contactId",l:"Contact",fmt:r => esc((contact(r.contactId)||{}).name||"-")},
+      {k:"origin",l:"Origin"},
+      {k:"created",l:"Opened",fmt:r => ago(r.created)}
+    ],
+    filters:[{k:"status",l:"Status",opts:CASE_STATUS},{k:"priority",l:"Priority",opts:["High","Normal","Low"]},{k:"origin",l:"Origin"}],
+    form:[
+      {k:"subject",l:"Subject",req:true,full:true},
+      {k:"status",l:"Status",opts:CASE_STATUS},{k:"priority",l:"Priority",opts:["High","Normal","Low"]},
+      {k:"accountId",l:"Account",ref:"accounts"},{k:"contactId",l:"Contact",ref:"contacts"},
+      {k:"origin",l:"Origin",opts:["Phone","Email","Web","Chat"]},
+      {k:"desc",l:"Description",type:"textarea",full:true}
+    ],
+    highlights:r => [["Status",r.status],["Priority",r.priority],["Origin",r.origin],["Opened",ago(r.created)]]
+  },
+  campaigns:{
+    key:"campaigns", label:"Campaigns", one:"Campaign", icon:"i-campaign", color:"var(--o-campaign)",
+    title:r => r.name, sub:r => r.type + " - " + r.status,
+    columns:[
+      {k:"name",l:"Campaign",link:true},{k:"type",l:"Type"},
+      {k:"status",l:"Status",pill:r => campPill(r.status)},
+      {k:"budget",l:"Budget",fmt:r => '<span class="num">'+money(r.budget)+'</span>'},
+      {k:"cost",l:"Actual Cost",fmt:r => '<span class="num">'+money(r.cost)+'</span>'},
+      {k:"leads",l:"Leads",fmt:r => '<span class="num">'+r.leads+'</span>'},
+      {k:"converted",l:"Converted",fmt:r => '<span class="num">'+r.converted+'</span>'}
+    ],
+    filters:[{k:"type",l:"Type"},{k:"status",l:"Status"},{k:"owner",l:"Owner"}],
+    form:[
+      {k:"name",l:"Campaign Name",req:true,full:true},
+      {k:"type",l:"Type",opts:["Event","Direct Mail","Social","Referral","Email"]},
+      {k:"status",l:"Status",opts:["Planned","In Progress","Completed","Aborted"]},
+      {k:"budget",l:"Budget (EUR)",type:"number"},{k:"cost",l:"Actual Cost (EUR)",type:"number"},
+      {k:"start",l:"Start Date",type:"date"},{k:"end",l:"End Date",type:"date"},
+      {k:"leads",l:"Leads Generated",type:"number"},{k:"converted",l:"Converted",type:"number"},
+      {k:"owner",l:"Owner",opts:OWNERS()}
+    ],
+    highlights:r => [["Budget",money(r.budget)],["Actual cost",money(r.cost)],["Leads",r.leads],["Conversion",r.leads? Math.round(r.converted/r.leads*100)+"%":"-"]]
+  }
+};
+function OWNERS(){ return ["Robert Fischer","Anong Petchara","Lena Brandt","Marco Keller"]; }
+
+/* ========================= PILLS ========================= */
+const leadPill = s => '<span class="pill '+({New:"info",Working:"warn",Nurturing:"",Qualified:"ok",Unqualified:"err"}[s]||"")+'">'+esc(s)+'</span>';
+const ratingPill = s => '<span class="pill '+({Hot:"err",Warm:"warn",Cold:"info"}[s]||"")+'">'+esc(s)+'</span>';
+const stagePill = s => '<span class="pill '+(s==="Placed"?"ok":s==="Withdrawn"?"err":STAGES.indexOf(s)>=3?"warn":"info")+'">'+esc(s)+'</span>';
+const casePill = s => '<span class="pill '+({New:"info","In Progress":"warn","Waiting on Family":"","Escalated":"err",Closed:"ok"}[s]||"")+'">'+esc(s)+'</span>';
+const prioPill = s => '<span class="pill '+({High:"err",Normal:"warn",Low:""}[s]||"")+'">'+esc(s)+'</span>';
+const campPill = s => '<span class="pill '+({Planned:"info","In Progress":"warn",Completed:"ok",Aborted:"err"}[s]||"")+'">'+esc(s)+'</span>';
+
+/* ========================= TOASTS ========================= */
+function toast(msg, kind){
+  const el = document.createElement("div");
+  el.className = "toast" + (kind ? " " + kind : "");
+  el.innerHTML = '<svg><use href="#i-check"/></svg><span>' + esc(msg) + "</span>";
+  $("#toasts").appendChild(el);
+  setTimeout(() => { el.style.opacity = "0"; el.style.transition = "opacity .3s"; setTimeout(() => el.remove(), 320); }, 3200);
+}
+
+/* ========================= MODAL ========================= */
+let lastFocus = null;
+function openModal(title, bodyHTML, footerHTML, onMount){
+  lastFocus = document.activeElement;
+  const root = $("#modal-root");
+  root.innerHTML =
+    '<div class="backdrop" role="dialog" aria-modal="true" aria-label="'+esc(title)+'">' +
+      '<div class="modal">' +
+        '<div class="modal-h"><h2>'+esc(title)+'</h2>' +
+          '<button class="btn btn--ghost" data-close aria-label="Close"><svg><use href="#i-close"/></svg></button></div>' +
+        '<div class="modal-b">'+bodyHTML+'</div>' +
+        (footerHTML ? '<div class="modal-f">'+footerHTML+'</div>' : "") +
+      "</div></div>";
+  root.querySelector(".backdrop").addEventListener("mousedown", e => { if (e.target.classList.contains("backdrop")) closeModal(); });
+  $$("[data-close]", root).forEach(b => b.addEventListener("click", closeModal));
+  document.addEventListener("keydown", escClose);
+  const first = root.querySelector("input,select,textarea,button:not([data-close])");
+  if (first) first.focus();
+  if (onMount) onMount(root);
+}
+function escClose(e){ if (e.key === "Escape") closeModal(); }
+function closeModal(){
+  $("#modal-root").innerHTML = "";
+  document.removeEventListener("keydown", escClose);
+  if (lastFocus && lastFocus.focus) lastFocus.focus();
+}
+
+/* ========================= FORMS ========================= */
+function formHTML(fields, rec){
+  rec = rec || {};
+  return '<form class="form" id="recform">' + fields.map(f => {
+    const v = rec[f.k] == null ? "" : rec[f.k];
+    let input;
+    if (f.ref){
+      const list = DB[f.ref] || [];
+      input = '<select name="'+f.k+'"><option value="">-- none --</option>' +
+        list.map(o => '<option value="'+esc(o.id)+'"'+(o.id===v?" selected":"")+'>'+esc(o.name)+'</option>').join("") + "</select>";
+    } else if (f.opts){
+      input = '<select name="'+f.k+'">' + f.opts.map(o => '<option'+(o===v?" selected":"")+'>'+esc(o)+"</option>").join("") + "</select>";
+    } else if (f.type === "textarea"){
+      input = '<textarea name="'+f.k+'">'+esc(v)+"</textarea>";
+    } else {
+      input = '<input name="'+f.k+'" type="'+(f.type||"text")+'" value="'+esc(v)+'"'+(f.req?" required":"")+">";
+    }
+    return '<label class="'+(f.full||f.type==="textarea"?"full":"")+'">' +
+      '<span>'+esc(f.l)+(f.req?' <b class="req">*</b>':"")+"</span>" + input + "</label>";
+  }).join("") + "</form>";
+}
+function readForm(){
+  const fd = new FormData($("#recform"));
+  const o = {};
+  fd.forEach((v,k) => { o[k] = v; });
+  ["amount","budget","cost","leads","converted","seats"].forEach(k => { if (o[k] !== undefined && o[k] !== "") o[k] = Number(o[k]); });
+  return o;
+}
+</script>
+
+<script>
+"use strict";
+/* ========================= CHARTS ========================= */
+function funnelBlock(rows){
+  const max = Math.max(1, ...rows.map(r => r.value));
+  return '<div style="display:flex;flex-direction:column;gap:.6rem">' + rows.map(r =>
+    '<div>' +
+      '<div style="display:flex;justify-content:space-between;gap:.5rem;font-size:.82rem;margin-bottom:.2rem">' +
+        '<span style="font-weight:600">'+esc(r.label)+' <span style="color:var(--text-3);font-weight:400">('+r.count+')</span></span>' +
+        '<span class="num" style="font-weight:700">'+money(r.value)+"</span></div>" +
+      '<div class="meter"><i style="width:'+Math.max(1,(r.value/max)*100)+'%;background:'+r.color+'"></i></div>' +
+    "</div>").join("") + "</div>";
+}
+function columnChart(data, opts){
+  opts = opts || {};
+  const w = 320, h = 150, pad = 26, bw = (w - pad) / data.length;
+  const max = Math.max(1, ...data.map(d => d.value));
+  const ticks = 3;
+  let g = "";
+  for (let i = 0; i <= ticks; i++){
+    const y = 10 + (h - 34) * (i / ticks);
+    g += '<line class="gridline" x1="'+pad+'" y1="'+y+'" x2="'+w+'" y2="'+y+'"/>' +
+         '<text x="'+(pad-4)+'" y="'+(y+3.5)+'" text-anchor="end">'+ (opts.money ? moneyShort(Math.round(max*(1-i/ticks))) : Math.round(max*(1-i/ticks))) +"</text>";
+  }
+  const bars = data.map((d,i) => {
+    const bh = (d.value / max) * (h - 34);
+    const x = pad + i * bw + bw * 0.18;
+    const y = 10 + (h - 34) - bh;
+    return '<rect x="'+x+'" y="'+y+'" width="'+(bw*0.64)+'" height="'+Math.max(0,bh)+'" rx="1.5" fill="'+(d.color||"var(--brand)")+'"><title>'+esc(d.label+": "+(opts.money?money(d.value):d.value))+'</title></rect>' +
+      '<text x="'+(x+bw*0.32)+'" y="'+(h-8)+'" text-anchor="middle">'+esc(d.label)+"</text>";
+  }).join("");
+  return '<svg class="chart" viewBox="0 0 '+w+' '+h+'" role="img" aria-label="Column chart">'+g+bars+"</svg>";
+}
+function donutChart(slices){
+  const total = slices.reduce((s,x) => s + x.value, 0) || 1;
+  const R = 42, C = 2 * Math.PI * R;
+  let off = 0;
+  const arcs = slices.map(s => {
+    const len = (s.value / total) * C;
+    const el = '<circle cx="60" cy="60" r="'+R+'" fill="none" stroke="'+s.color+'" stroke-width="17" ' +
+      'stroke-dasharray="'+len+' '+(C-len)+'" stroke-dashoffset="'+(-off)+'" transform="rotate(-90 60 60)"><title>'+esc(s.label+": "+s.value)+"</title></circle>";
+    off += len;
+    return el;
+  }).join("");
+  return '<div style="display:flex;align-items:center;gap:1rem;flex-wrap:wrap">' +
+    '<svg class="chart" style="width:120px;flex:0 0 120px" viewBox="0 0 120 120" role="img" aria-label="Distribution">' +
+      '<circle cx="60" cy="60" r="42" fill="none" stroke="var(--track)" stroke-width="17"/>' + arcs +
+      '<text x="60" y="58" text-anchor="middle" class="lbl-v" style="font-size:19px">'+total+"</text>" +
+      '<text x="60" y="72" text-anchor="middle" style="font-size:9px">total</text></svg>' +
+    '<div class="legend" style="flex:1;min-width:130px;flex-direction:column;gap:.3rem">' +
+      slices.map(s => '<span><i style="background:'+s.color+'"></i>'+esc(s.label)+' <b style="margin-left:auto;color:var(--text)">'+s.value+"</b></span>").join("") +
+    "</div></div>";
+}
+
+/* ========================= SHARED VIEW PARTS ========================= */
+function pageHead(o){
+  return '<div class="pagehead"><div class="ph-top">' +
+    '<span class="icon lg" style="background:'+o.color+'"><svg><use href="#'+o.icon+'"/></svg></span>' +
+    '<div class="ph-titles"><div class="ph-eyebrow">'+esc(o.eyebrow)+'</div><h1 class="ph-title">'+esc(o.title)+"</h1>" +
+      (o.sub ? '<div class="ph-eyebrow">'+esc(o.sub)+"</div>" : "") + "</div>" +
+    '<div class="ph-actions">'+(o.actions||"")+"</div></div>" +
+    (o.highlights ? '<dl class="highlights">' + o.highlights.map(h =>
+      '<div class="hl"><dt>'+esc(h[0])+"</dt><dd>"+ (typeof h[1] === "number" ? h[1] : esc(h[1])) +"</dd></div>").join("") + "</dl>" : "") +
+  "</div>";
+}
+function pathHTML(steps, current, lost){
+  return '<div class="path">' + steps.map(s => {
+    const ci = steps.indexOf(current), i = steps.indexOf(s);
+    let cls = i < ci ? "done" : i === ci ? "current" : "";
+    if (lost && i === steps.length - 1) cls = "lost";
+    return '<button class="pstep '+cls+'" data-step="'+esc(s)+'">'+esc(s)+"</button>";
+  }).join("") + "</div>";
+}
+function relatedActivities(t, id){
+  return DB.activities.filter(a => a.rel.t === t && a.rel.id === id).sort((a,b) => new Date(b.when) - new Date(a.when));
+}
+const ACT_ICON = {call:["i-phone","#4BC076"],email:["i-mail","#0176D3"],meeting:["i-cal","#A094ED"],note:["i-note","#FCB95B"]};
+function timelineHTML(acts, showRel){
+  if (!acts.length) return '<div class="empty-state"><svg><use href="#i-note"/></svg><p>No activity logged yet. Use <b>Log a Call</b> or <b>Post Note</b> to add the first one.</p></div>';
+  return '<ul class="tl">' + acts.map(a => {
+    const ic = ACT_ICON[a.type] || ACT_ICON.note;
+    return "<li>" +
+      '<span class="icon sm" style="background:'+ic[1]+'"><svg><use href="#'+ic[0]+'"/></svg></span>' +
+      '<div class="body"><div class="who">'+esc(a.who)+' <span style="font-weight:400;color:var(--text-3)">logged a '+esc(a.type)+"</span></div>" +
+        '<div class="txt">'+esc(a.text)+"</div>" +
+        '<div class="when">'+ago(a.when)+ (showRel && a.rel ? " - " + esc(relName(a.rel)) : "") + "</div></div></li>";
+  }).join("") + "</ul>";
+}
+function relName(rel){
+  const map = {opportunity:"opportunities",lead:"leads",account:"accounts",contact:"contacts",case:"cases",campaign:"campaigns"};
+  const coll = DB[map[rel.t]] || [];
+  const r = byId(coll, rel.id);
+  if (!r) return rel.t;
+  return r.name || r.subject || r.num || rel.t;
+}
+function relHref(rel){
+  const map = {opportunity:"opportunities",lead:"leads",account:"accounts",contact:"contacts",case:"cases",campaign:"campaigns"};
+  return "#/" + map[rel.t] + "/" + rel.id;
+}
+function taskListHTML(tasks, showRel){
+  if (!tasks.length) return '<div class="empty-state"><svg><use href="#i-task"/></svg><p>Nothing open. Enjoy it while it lasts.</p></div>';
+  return '<ul class="tasks">' + tasks.map(t =>
+    '<li class="'+(t.done?"done":"")+'">' +
+      '<input type="checkbox" data-task="'+t.id+'"'+(t.done?" checked":"")+' aria-label="Complete task">' +
+      '<div class="s"><div class="t">'+esc(t.subject)+"</div>" +
+        '<div class="d">'+(t.done ? "Completed" : dueLabel(t.due))+" - "+esc(t.owner) +
+          (showRel && t.rel ? ' - <a href="'+relHref(t.rel)+'">'+esc(relName(t.rel))+"</a>" : "") + "</div></div>" +
+      prioPill(t.priority) + "</li>").join("") + "</ul>";
+}
+
+/* ========================= HOME ========================= */
+function viewHome(){
+  const open = DB.opportunities.filter(o => o.stage !== "Placed" && o.stage !== "Withdrawn");
+  const placed = DB.opportunities.filter(o => o.stage === "Placed");
+  const lost = DB.opportunities.filter(o => o.stage === "Withdrawn");
+  const pipeline = open.reduce((s,o) => s + o.amount, 0);
+  const weighted = open.reduce((s,o) => s + o.amount * (STAGE_PROB[o.stage]||0)/100, 0);
+  const won = placed.reduce((s,o) => s + o.amount, 0);
+  const winRate = (placed.length + lost.length) ? Math.round(placed.length/(placed.length+lost.length)*100) : 0;
+  const openCases = DB.cases.filter(c => c.status !== "Closed");
+  const myTasks = DB.tasks.filter(t => !t.done).sort((a,b) => a.due.localeCompare(b.due));
+
+  const openStages = STAGES.filter(s => s !== "Placed");   // "Placed" is won, not pipeline
+  const stageRows = openStages.map((s,i) => {
+    const os = open.filter(o => o.stage === s);
+    return {label:s, count:os.length, value:os.reduce((a,o) => a+o.amount,0),
+            color:["#B3D9F6","#8CC5F0","#5AA9E6","#2E8BD6","#0176D3"][i]};
+  });
+
+  const srcColors = ["#0176D3","#FCB95B","#A094ED","#4BC076","#F88962","#F2CF5B"];
+  const srcMap = {};
+  DB.leads.forEach(l => { srcMap[l.source] = (srcMap[l.source]||0) + 1; });
+  const srcSlices = Object.keys(srcMap).map((k,i) => ({label:k, value:srcMap[k], color:srcColors[i % srcColors.length]}));
+
+  const ownerData = OWNERS().map((o,i) => ({
+    label:o.split(" ")[0],
+    value:DB.opportunities.filter(x => x.owner === o && x.stage !== "Withdrawn").reduce((s,x) => s+x.amount,0),
+    color:["#0176D3","#4BC076","#A094ED","#FCB95B"][i]
+  }));
+
+  return (
+    '<div class="demo-banner"><svg style="width:16px;height:16px;fill:var(--brand);flex-shrink:0"><use href="#i-report"/></svg>' +
+      '<span><strong>Prototype.</strong> Everything you click here is real: records save to this browser and survive a refresh. No server involved.</span>' +
+      '<span class="spacer"></span>' +
+      '<button class="btn btn--sm" id="reset-db"><svg><use href="#i-refresh"/></svg>Reset demo data</button></div>' +
+
+    pageHead({icon:"i-home", color:"var(--o-home)", eyebrow:"Sales Console", title:"Welcome back, Robert",
+      sub:"Exchange Programs - Autumn 2026 intake",
+      actions:'<button class="btn" data-new="leads"><svg><use href="#i-plus"/></svg>New Lead</button>' +
+              '<button class="btn btn--brand" data-new="opportunities"><svg><use href="#i-plus"/></svg>New Placement</button>'}) +
+
+    '<dl class="kpis">' +
+      kpi("Open pipeline", money(pipeline), open.length + " open placements", "var(--brand)", "flat") +
+      kpi("Weighted forecast", money(weighted), "Probability adjusted", "#A094ED", "up") +
+      kpi("Placed this year", money(won), placed.length + " students placed", "var(--ok)", "up") +
+      kpi("Win rate", winRate + "%", placed.length + " won / " + lost.length + " withdrawn", "#FCB95B", winRate >= 60 ? "up" : "down") +
+    "</dl>" +
+
+    '<div class="grid g-2-1" style="margin-bottom:.75rem">' +
+      '<section class="card"><div class="card-h">' +
+        '<span class="icon sm" style="background:var(--o-opp)"><svg><use href="#i-opp"/></svg></span>' +
+        "<h2>Pipeline by stage</h2><span class='count'>" + money(pipeline) + "</span></div>" +
+        '<div class="card-b">' + funnelBlock(stageRows) +
+          '<div style="margin-top:1rem;border-top:1px solid var(--border);padding-top:.75rem">' +
+          '<div style="font-size:.72rem;text-transform:uppercase;letter-spacing:.06em;color:var(--text-3);font-weight:700;margin-bottom:.5rem">Closed this intake</div>' +
+          '<div style="display:flex;gap:.75rem;flex-wrap:wrap">' +
+            closedTile("Placed", won, "var(--ok)", placed.length + " placement" + (placed.length===1?"":"s")) +
+            closedTile("Withdrawn", lost.reduce((s,o)=>s+o.amount,0), "var(--err)", lost.length + " placement" + (lost.length===1?"":"s")) +
+            closedTile("Average fee", placed.length ? Math.round(won/placed.length) : 0, "var(--brand)", "per placement") +
+          "</div></div></div>" +
+        '<div class="card-f"><button data-go="#/opportunities">View all placements</button></div></section>' +
+
+      '<section class="card"><div class="card-h">' +
+        '<span class="icon sm" style="background:var(--o-lead)"><svg><use href="#i-lead"/></svg></span>' +
+        "<h2>Leads by source</h2></div>" +
+        '<div class="card-b">' + donutChart(srcSlices) +
+          '<div style="margin-top:1rem;border-top:1px solid var(--border);padding-top:.75rem">' +
+          '<div style="font-size:.72rem;text-transform:uppercase;letter-spacing:.06em;color:var(--text-3);font-weight:700;margin-bottom:.5rem">By status</div>' +
+          '<div style="display:flex;flex-direction:column;gap:.5rem">' + LEAD_STATUS.map(st => {
+            const n = DB.leads.filter(l => l.status === st).length;
+            return '<div><div style="display:flex;justify-content:space-between;font-size:.82rem;margin-bottom:.2rem">' +
+              "<span>"+esc(st)+'</span><span class="num" style="font-weight:700">'+n+"</span></div>" +
+              '<div class="meter"><i style="width:'+(DB.leads.length?n/DB.leads.length*100:0)+'%"></i></div></div>';
+          }).join("") + "</div></div></div>" +
+        '<div class="card-f"><button data-go="#/leads">View all leads</button></div></section>' +
+    "</div>" +
+
+    '<div class="grid g-2" style="margin-bottom:.75rem">' +
+      '<section class="card"><div class="card-h">' +
+        '<span class="icon sm" style="background:var(--o-task)"><svg><use href="#i-task"/></svg></span>' +
+        "<h2>My tasks</h2><span class='count'>" + myTasks.length + " open</span></div>" +
+        '<div class="card-b flush">' + taskListHTML(myTasks.slice(0,6), true) + "</div>" +
+        '<div class="card-f"><button data-go="#/tasks">View all tasks</button></div></section>' +
+
+      '<section class="card"><div class="card-h">' +
+        '<span class="icon sm" style="background:var(--o-case)"><svg><use href="#i-case"/></svg></span>' +
+        "<h2>Cases needing attention</h2><span class='count'>" + openCases.length + " open</span></div>" +
+        '<div class="card-b flush"><div class="tblwrap"><table class="tbl"><tbody>' +
+          openCases.slice(0,6).map(c =>
+            '<tr data-href="#/cases/'+c.id+'"><td data-l=""><span class="lnk">'+esc(c.subject)+"</span></td>" +
+            '<td data-l="Status">'+casePill(c.status)+"</td><td data-l=\"Priority\">"+prioPill(c.priority)+"</td>" +
+            '<td data-l="Opened">'+ago(c.created)+"</td></tr>").join("") +
+        "</tbody></table></div></div>" +
+        '<div class="card-f"><button data-go="#/cases">View all cases</button></div></section>' +
+    "</div>" +
+
+    '<div class="grid g-2">' +
+      '<section class="card"><div class="card-h">' +
+        '<span class="icon sm" style="background:var(--o-report)"><svg><use href="#i-report"/></svg></span>' +
+        "<h2>Pipeline by owner</h2></div>" +
+        '<div class="card-b">' + columnChart(ownerData, {money:true}) + "</div></section>" +
+
+      '<section class="card"><div class="card-h">' +
+        '<span class="icon sm" style="background:var(--o-contact)"><svg><use href="#i-contact"/></svg></span>' +
+        "<h2>Recent activity</h2></div>" +
+        '<div class="card-b flush">' + timelineHTML(DB.activities.slice().sort((a,b) => new Date(b.when)-new Date(a.when)).slice(0,6), true) + "</div></section>" +
+    "</div>"
+  );
+}
+function closedTile(label, value, color, sub){
+  return '<div style="flex:1 1 120px;background:var(--surface-2);border:1px solid var(--border);border-radius:var(--radius);padding:.5rem .6rem">' +
+    '<div style="font-size:.75rem;color:var(--text-2)">'+esc(label)+"</div>" +
+    '<div class="num" style="font-size:1.05rem;font-weight:700;color:'+color+'">'+money(value)+"</div>" +
+    '<div style="font-size:.72rem;color:var(--text-3)">'+esc(sub)+"</div></div>";
+}
+function kpi(label, value, sub, color, dir){
+  const arrow = dir === "up" ? "&#9650;" : dir === "down" ? "&#9660;" : "&#8226;";
+  return '<div class="kpi" style="--kpic:'+color+'"><dt>'+esc(label)+"</dt><dd>"+esc(value)+"</dd>" +
+    '<div class="delta '+dir+'">'+arrow+" <span style='color:var(--text-2);font-weight:400'>"+esc(sub)+"</span></div></div>";
+}
+</script>
+
+<script>
+"use strict";
+/* ========================= LIST VIEWS ========================= */
+const LS = {};
+function lstate(key){
+  if (!LS[key]) LS[key] = {q:"", f:{}, sort:{k:null,dir:1}, view:"list"};
+  return LS[key];
+}
+function filterRows(o){
+  const st = lstate(o.key);
+  let rows = DB[o.key].slice();
+  const q = st.q.trim().toLowerCase();
+  if (q) rows = rows.filter(r => Object.keys(r).some(k => typeof r[k] === "string" && r[k].toLowerCase().includes(q)));
+  Object.keys(st.f).forEach(k => { if (st.f[k]) rows = rows.filter(r => String(r[k]) === st.f[k]); });
+  if (st.sort.k){
+    rows.sort((a,b) => {
+      const x = a[st.sort.k], y = b[st.sort.k];
+      if (typeof x === "number" && typeof y === "number") return (x-y) * st.sort.dir;
+      return String(x||"").localeCompare(String(y||"")) * st.sort.dir;
+    });
+  }
+  return rows;
+}
+function viewList(key){
+  const o = OBJ[key], st = lstate(key), rows = filterRows(o);
+  const isOpp = key === "opportunities";
+
+  const filters = o.filters.map(f => {
+    const opts = f.opts || Array.from(new Set(DB[o.key].map(r => r[f.k]).filter(Boolean))).sort();
+    return '<select data-filter="'+f.k+'"><option value="">All '+esc(f.l)+"</option>" +
+      opts.map(v => '<option'+(st.f[f.k]===v?" selected":"")+">"+esc(v)+"</option>").join("") + "</select>";
+  }).join("");
+
+  const head = pageHead({
+    icon:o.icon, color:o.color, eyebrow:o.label, title:o.label,
+    sub:rows.length + " of " + DB[o.key].length + " records - sorted by " + (st.sort.k || "default order"),
+    actions:
+      (isOpp ? '<button class="btn" id="toggle-view"><svg><use href="#'+(st.view==="list"?"i-grid":"i-list")+'"/></svg>'+(st.view==="list"?"Kanban":"List")+"</button>" : "") +
+      '<button class="btn btn--brand" data-new="'+key+'"><svg><use href="#i-plus"/></svg>New '+esc(o.one)+"</button>"
+  });
+
+  if (isOpp && st.view === "kanban") return head + kanbanHTML();
+
+  const body = rows.length === 0
+    ? '<div class="empty-state"><svg><use href="#'+o.icon+'"/></svg><p>No '+esc(o.label.toLowerCase())+" match those filters. Clear the search box or pick a different filter.</p></div>"
+    : '<div class="tblwrap"><table class="tbl"><thead><tr>' +
+        o.columns.map(c => '<th><button data-sort="'+c.k+'">'+esc(c.l) + (st.sort.k===c.k ? (st.sort.dir>0?" &#9650;":" &#9660;") : "") + "</button></th>").join("") +
+      "</tr></thead><tbody>" +
+        rows.map(r => '<tr data-href="#/'+key+"/"+r.id+'">' + o.columns.map(c => {
+          let v;
+          if (c.pill) v = c.pill(r);
+          else if (c.fmt) v = c.fmt(r);
+          else v = esc(r[c.k]);
+          if (c.link) v = '<span class="lnk">' + (c.fmt ? v : esc(r[c.k])) + "</span>";
+          return '<td data-l="'+esc(c.l)+'">'+v+"</td>";
+        }).join("") + "</tr>").join("") +
+      "</tbody></table></div>";
+
+  return head +
+    '<section class="card"><div class="toolbar">' +
+      '<input type="search" id="listq" placeholder="Search '+esc(o.label.toLowerCase())+'..." value="'+esc(st.q)+'">' +
+      filters +
+      '<span class="spacer"></span><span class="rescount">'+rows.length+" item"+(rows.length===1?"":"s")+"</span>" +
+    '</div><div class="card-b flush">' + body + "</div></section>";
+}
+
+/* ========================= KANBAN ========================= */
+function kanbanHTML(){
+  const cols = STAGES.concat(["Withdrawn"]);
+  return '<p class="khint">Drag a card to move the placement to another stage - or tap <b>Move</b> on a touch screen. Stage changes are saved immediately.</p>' +
+    '<div class="kanban">' + cols.map(s => {
+      const items = DB.opportunities.filter(o => o.stage === s);
+      const sum = items.reduce((a,o) => a + o.amount, 0);
+      return '<div class="kcol" data-stage="'+esc(s)+'">' +
+        '<div class="kcol-h"><div class="t">'+esc(s)+" ("+items.length+')</div><div class="v">'+money(sum)+"</div></div>" +
+        '<div class="kcol-b">' + items.map(o =>
+          '<div class="kcard" draggable="true" data-id="'+o.id+'" style="border-left-color:'+(s==="Placed"?"var(--ok)":s==="Withdrawn"?"var(--err)":"var(--o-opp)")+'">' +
+            '<div class="n"><a href="#/opportunities/'+o.id+'">'+esc(o.name)+"</a></div>" +
+            '<div style="color:var(--text-2);font-size:.78rem">'+esc((account(o.accountId)||{}).name||"")+"</div>" +
+            '<div class="m"><span class="amt">'+money(o.amount)+"</span>" +
+              '<button class="btn btn--sm" data-move="'+o.id+'">Move</button></div>' +
+          "</div>").join("") +
+        "</div></div>";
+    }).join("") + "</div>";
+}
+
+/* ========================= RECORD DETAIL ========================= */
+function viewRecord(key, id){
+  const o = OBJ[key], r = byId(DB[key], id);
+  if (!r) return '<div class="card"><div class="empty-state"><p>That record no longer exists. <a href="#/'+key+'">Back to '+esc(o.label)+"</a></p></div></div>";
+
+  const actionBtns =
+    (key === "leads" && r.status !== "Converted" ? '<button class="btn btn--brand" data-convert="'+r.id+'"><svg><use href="#i-convert"/></svg>Convert</button>' : "") +
+    '<button class="btn" data-log="call">Log a Call</button>' +
+    '<button class="btn" data-log="note">Post Note</button>' +
+    '<button class="btn" data-newtask="1">New Task</button>' +
+    '<button class="btn" data-edit="1">Edit</button>' +
+    '<button class="btn" data-del="1">Delete</button>';
+
+  let html = pageHead({
+    icon:o.icon, color:o.color, eyebrow:o.one, title:o.title(r), sub:o.sub(r),
+    actions:actionBtns, highlights:o.highlights(r)
+  });
+
+  if (key === "opportunities") html += '<section class="card" style="margin-bottom:.75rem"><div class="card-b">' +
+    pathHTML(STAGES, r.stage, r.stage === "Withdrawn") +
+    '<div style="margin-top:.6rem;font-size:.85rem;color:var(--text-2)"><b style="color:var(--text)">Next step:</b> ' + esc(r.next || "-") + "</div></div></section>";
+  if (key === "cases") html += '<section class="card" style="margin-bottom:.75rem"><div class="card-b">' +
+    pathHTML(CASE_STATUS, r.status, false) + "</div></section>";
+  if (key === "leads") html += '<section class="card" style="margin-bottom:.75rem"><div class="card-b">' +
+    pathHTML(LEAD_STATUS, r.status, r.status === "Unqualified") + "</div></section>";
+
+  const detailFields = o.form.map(f => {
+    let v = r[f.k];
+    if (f.ref) v = ((DB[f.ref]||[]).find(x => x.id === v) || {}).name;
+    if (f.type === "number" && (f.k === "amount" || f.k === "budget" || f.k === "cost")) v = money(r[f.k]);
+    if (f.type === "date") v = dfmt(r[f.k]);
+    const empty = v === undefined || v === null || v === "";
+    return '<div class="f"><dt>'+esc(f.l)+"</dt><dd"+(empty?' class="empty"':"")+">"+(empty?"Not filled in":esc(v))+"</dd></div>";
+  }).join("");
+
+  const acts = relatedActivities(singularOf(key), id);
+  const tasks = DB.tasks.filter(t => t.rel.t === singularOf(key) && t.rel.id === id);
+
+  html += '<div class="grid g-2-1">' +
+    '<div class="grid" style="gap:.75rem;align-content:start">' +
+      '<section class="card"><div class="card-h"><h2>Details</h2></div>' +
+        '<div class="card-b"><dl class="fields">'+detailFields+"</dl></div></section>" +
+      relatedLists(key, r) +
+    "</div>" +
+    '<div class="grid" style="gap:.75rem;align-content:start">' +
+      '<section class="card"><div class="card-h">' +
+        '<span class="icon sm" style="background:var(--o-task)"><svg><use href="#i-task"/></svg></span>' +
+        "<h2>Tasks</h2><span class='count'>"+tasks.length+"</span></div>" +
+        '<div class="card-b flush">'+taskListHTML(tasks,false)+"</div></section>" +
+      '<section class="card"><div class="card-h">' +
+        '<span class="icon sm" style="background:var(--brand)"><svg><use href="#i-note"/></svg></span>' +
+        "<h2>Activity</h2><span class='count'>"+acts.length+"</span></div>" +
+        '<div class="card-b flush">'+timelineHTML(acts,false)+"</div></section>" +
+    "</div></div>";
+
+  return html;
+}
+function singularOf(key){
+  return {leads:"lead",accounts:"account",contacts:"contact",opportunities:"opportunity",cases:"case",campaigns:"campaign"}[key];
+}
+function miniTable(title, icon, color, rows, cols, hrefBase){
+  return '<section class="card"><div class="card-h">' +
+    '<span class="icon sm" style="background:'+color+'"><svg><use href="#'+icon+'"/></svg></span>' +
+    "<h2>"+esc(title)+"</h2><span class='count'>"+rows.length+"</span></div>" +
+    '<div class="card-b flush">' + (rows.length ?
+      '<div class="tblwrap"><table class="tbl"><thead><tr>' + cols.map(c => "<th>"+esc(c.l)+"</th>").join("") + "</tr></thead><tbody>" +
+      rows.map(r => '<tr data-href="'+hrefBase+r.id+'">' + cols.map((c,i) =>
+        '<td data-l="'+esc(c.l)+'">' + (i===0 ? '<span class="lnk">'+c.v(r)+"</span>" : c.v(r)) + "</td>").join("") + "</tr>").join("") +
+      "</tbody></table></div>"
+      : '<div class="empty-state"><p>Nothing linked yet.</p></div>') + "</div></section>";
+}
+function relatedLists(key, r){
+  if (key === "accounts"){
+    return miniTable("Contacts","i-contact","var(--o-contact)", DB.contacts.filter(c => c.accountId === r.id),
+        [{l:"Name",v:x=>esc(x.name)},{l:"Role",v:x=>esc(x.role)},{l:"Email",v:x=>esc(x.email)}], "#/contacts/") +
+      miniTable("Placements","i-opp","var(--o-opp)", DB.opportunities.filter(o => o.accountId === r.id),
+        [{l:"Placement",v:x=>esc(x.name)},{l:"Stage",v:x=>stagePill(x.stage)},{l:"Fee",v:x=>'<span class="num">'+money(x.amount)+"</span>"}], "#/opportunities/") +
+      miniTable("Cases","i-case","var(--o-case)", DB.cases.filter(c => c.accountId === r.id),
+        [{l:"Subject",v:x=>esc(x.subject)},{l:"Status",v:x=>casePill(x.status)},{l:"Priority",v:x=>prioPill(x.priority)}], "#/cases/");
+  }
+  if (key === "contacts"){
+    return miniTable("Placements","i-opp","var(--o-opp)", DB.opportunities.filter(o => o.contactId === r.id),
+        [{l:"Placement",v:x=>esc(x.name)},{l:"Stage",v:x=>stagePill(x.stage)},{l:"Close",v:x=>dfmt(x.close)}], "#/opportunities/") +
+      miniTable("Cases","i-case","var(--o-case)", DB.cases.filter(c => c.contactId === r.id),
+        [{l:"Subject",v:x=>esc(x.subject)},{l:"Status",v:x=>casePill(x.status)}], "#/cases/");
+  }
+  if (key === "opportunities"){
+    const rows = [account(r.accountId)].filter(Boolean);
+    return miniTable("Account","i-account","var(--o-account)", rows,
+        [{l:"Account",v:x=>esc(x.name)},{l:"Type",v:x=>esc(x.type)},{l:"City",v:x=>esc(x.city)}], "#/accounts/") +
+      miniTable("Student / Contact","i-contact","var(--o-contact)", [contact(r.contactId)].filter(Boolean),
+        [{l:"Name",v:x=>esc(x.name)},{l:"Role",v:x=>esc(x.role)},{l:"Email",v:x=>esc(x.email)}], "#/contacts/");
+  }
+  if (key === "cases"){
+    return miniTable("Account","i-account","var(--o-account)", [account(r.accountId)].filter(Boolean),
+        [{l:"Account",v:x=>esc(x.name)},{l:"Type",v:x=>esc(x.type)}], "#/accounts/") +
+      miniTable("Contact","i-contact","var(--o-contact)", [contact(r.contactId)].filter(Boolean),
+        [{l:"Name",v:x=>esc(x.name)},{l:"Phone",v:x=>esc(x.phone)}], "#/contacts/") +
+      '<section class="card"><div class="card-h"><h2>Description</h2></div><div class="card-b" style="color:var(--text-2);font-size:.9rem">'+esc(r.desc||"-")+"</div></section>";
+  }
+  if (key === "campaigns"){
+    const roi = r.cost ? Math.round((r.converted * 8500 - r.cost) / r.cost * 100) : 0;
+    return '<section class="card"><div class="card-h"><h2>Performance</h2></div><div class="card-b">' +
+      '<dl class="fields">' +
+        '<div class="f"><dt>Cost per lead</dt><dd>'+(r.leads?money(Math.round(r.cost/r.leads)):"-")+"</dd></div>" +
+        '<div class="f"><dt>Conversion rate</dt><dd>'+(r.leads?Math.round(r.converted/r.leads*100)+"%":"-")+"</dd></div>" +
+        '<div class="f"><dt>Budget used</dt><dd>'+(r.budget?Math.round(r.cost/r.budget*100)+"%":"-")+"</dd></div>" +
+        '<div class="f"><dt>Estimated ROI</dt><dd>'+roi+"%</dd></div>" +
+      "</dl><div style='margin-top:.75rem'><div style='font-size:.8rem;color:var(--text-2);margin-bottom:.25rem'>Budget consumed</div>" +
+      '<div class="meter"><i style="width:'+Math.min(100,r.budget?r.cost/r.budget*100:0)+'%"></i></div></div></div></section>';
+  }
+  if (key === "leads"){
+    return '<section class="card"><div class="card-h"><h2>Qualification notes</h2></div>' +
+      '<div class="card-b" style="color:var(--text-2);font-size:.9rem">'+esc(r.note||"No notes yet.")+"</div></section>";
+  }
+  return "";
+}
+
+/* ========================= TASKS VIEW ========================= */
+function viewTasks(){
+  const openT = DB.tasks.filter(t => !t.done).sort((a,b) => a.due.localeCompare(b.due));
+  const doneT = DB.tasks.filter(t => t.done);
+  const overdue = openT.filter(t => daysTo(t.due) < 0);
+  return pageHead({icon:"i-task", color:"var(--o-task)", eyebrow:"Activities", title:"Tasks",
+      sub:openT.length + " open, " + overdue.length + " overdue",
+      actions:'<button class="btn btn--brand" data-newtask="1"><svg><use href="#i-plus"/></svg>New Task</button>'}) +
+    '<div class="grid g-2">' +
+      '<section class="card"><div class="card-h"><h2>Open</h2><span class="count">'+openT.length+"</span></div>" +
+        '<div class="card-b flush">'+taskListHTML(openT,true)+"</div></section>" +
+      '<section class="card"><div class="card-h"><h2>Completed</h2><span class="count">'+doneT.length+"</span></div>" +
+        '<div class="card-b flush">'+taskListHTML(doneT,true)+"</div></section>" +
+    "</div>";
+}
+
+/* ========================= REPORTS ========================= */
+function viewReports(){
+  const opps = DB.opportunities;
+  const byCountry = {};
+  opps.filter(o => o.stage !== "Withdrawn").forEach(o => {
+    const a = account(o.accountId);
+    const c = a ? a.country : "Unknown";
+    byCountry[c] = (byCountry[c]||0) + o.amount;
+  });
+  const countryRows = Object.keys(byCountry).map(k => ({label:k, value:byCountry[k]})).sort((a,b) => b.value-a.value);
+  const maxC = Math.max(1, ...countryRows.map(r => r.value));
+
+  const monthly = {};
+  opps.forEach(o => {
+    const m = new Date(o.close).toLocaleDateString("en-GB",{month:"short"});
+    monthly[m] = (monthly[m]||0) + (o.stage === "Withdrawn" ? 0 : o.amount);
+  });
+  const monthData = Object.keys(monthly).slice(0,6).map((m,i) => ({label:m, value:monthly[m], color:"#0176D3"}));
+
+  const caseByStatus = CASE_STATUS.map((s,i) => ({label:s, value:DB.cases.filter(c => c.status===s).length,
+    color:["#0176D3","#FCB95B","#A094ED","#F88962","#4BC076"][i]}));
+
+  return pageHead({icon:"i-report", color:"var(--o-report)", eyebrow:"Analytics", title:"Reports",
+      sub:"Live from the same records - change anything and these numbers move"}) +
+    '<div class="grid g-2" style="margin-bottom:.75rem">' +
+      '<section class="card"><div class="card-h"><h2>Pipeline value by destination country</h2></div><div class="card-b">' +
+        '<div style="display:flex;flex-direction:column;gap:.55rem">' + countryRows.map(r =>
+          '<div><div style="display:flex;justify-content:space-between;font-size:.83rem;margin-bottom:.2rem">' +
+            "<span>"+esc(r.label)+'</span><span class="num" style="font-weight:700">'+money(r.value)+"</span></div>" +
+          '<div class="meter"><i style="width:'+(r.value/maxC*100)+'%"></i></div></div>').join("") +
+        "</div></div></section>" +
+      '<section class="card"><div class="card-h"><h2>Expected close value by month</h2></div>' +
+        '<div class="card-b">'+columnChart(monthData,{money:true})+"</div></section>" +
+    "</div>" +
+    '<div class="grid g-2" style="margin-bottom:.75rem">' +
+      '<section class="card"><div class="card-h"><h2>Cases by status</h2></div>' +
+        '<div class="card-b">'+donutChart(caseByStatus)+"</div></section>" +
+      '<section class="card"><div class="card-h"><h2>Campaign return</h2></div><div class="card-b flush"><div class="tblwrap">' +
+        '<table class="tbl"><thead><tr><th>Campaign</th><th>Cost</th><th>Leads</th><th>Converted</th><th>Cost / lead</th></tr></thead><tbody>' +
+        DB.campaigns.map(c => '<tr data-href="#/campaigns/'+c.id+'">' +
+          '<td data-l="Campaign"><span class="lnk">'+esc(c.name)+'</span></td>' +
+          '<td data-l="Cost" class="num">'+money(c.cost)+"</td>" +
+          '<td data-l="Leads" class="num">'+c.leads+"</td>" +
+          '<td data-l="Converted" class="num">'+c.converted+"</td>" +
+          '<td data-l="Cost / lead" class="num">'+(c.leads?money(Math.round(c.cost/c.leads)):"-")+"</td></tr>").join("") +
+        "</tbody></table></div></div></section>" +
+    "</div>" +
+    '<section class="card"><div class="card-h"><h2>Placement forecast detail</h2></div><div class="card-b flush"><div class="tblwrap">' +
+      '<table class="tbl"><thead><tr><th>Placement</th><th>Stage</th><th>Fee</th><th>Probability</th><th>Weighted</th><th>Close</th></tr></thead><tbody>' +
+      opps.filter(o => o.stage !== "Withdrawn").sort((a,b) => a.close.localeCompare(b.close)).map(o =>
+        '<tr data-href="#/opportunities/'+o.id+'"><td data-l="Placement"><span class="lnk">'+esc(o.name)+"</span></td>" +
+        '<td data-l="Stage">'+stagePill(o.stage)+"</td>" +
+        '<td data-l="Fee" class="num">'+money(o.amount)+"</td>" +
+        '<td data-l="Probability" class="num">'+(STAGE_PROB[o.stage]||0)+"%</td>" +
+        '<td data-l="Weighted" class="num">'+money(Math.round(o.amount*(STAGE_PROB[o.stage]||0)/100))+"</td>" +
+        '<td data-l="Close">'+dfmt(o.close)+"</td></tr>").join("") +
+      "</tbody></table></div></div></section>";
+}
+</script>
+
+<script>
+"use strict";
+/* ========================= ROUTER ========================= */
+function route(){
+  const h = (location.hash || "#/home").replace(/^#\/?/, "");
+  const [key, id] = h.split("/");
+  return {key: key || "home", id};
+}
+function render(){
+  const {key, id} = route();
+  const app = $("#app");
+  let html;
+  if (key === "home") html = viewHome();
+  else if (key === "tasks") html = viewTasks();
+  else if (key === "reports") html = viewReports();
+  else if (OBJ[key]) html = id ? viewRecord(key, id) : viewList(key);
+  else html = '<div class="card"><div class="empty-state"><p>Page not found. <a href="#/home">Back to Home</a></p></div></div>';
+  app.innerHTML = html;
+
+  $$(".navitem").forEach(a => {
+    const target = a.getAttribute("href").slice(2);
+    if (target === key) a.setAttribute("aria-current","page"); else a.removeAttribute("aria-current");
+  });
+  wire(key, id);
+  window.scrollTo({top:0, behavior:"instant"});
+}
+
+/* ========================= EVENT WIRING ========================= */
+function wire(key, id){
+  const app = $("#app");
+
+  const rd = $("#reset-db");
+  if (rd) rd.addEventListener("click", () => {
+    openModal("Reset demo data",
+      "<p>This clears every change you have made and reloads the original demo records.</p>",
+      '<button class="btn" data-close>Cancel</button><button class="btn btn--brand" id="do-reset">Reset</button>',
+      root => root.querySelector("#do-reset").addEventListener("click", () => { closeModal(); resetDB(); }));
+  });
+
+  $$("[data-go]", app).forEach(b => b.addEventListener("click", () => { location.hash = b.dataset.go; }));
+
+  $$("tr[data-href]", app).forEach(tr => tr.addEventListener("click", e => {
+    if (e.target.closest("a,button,input")) return;
+    location.hash = tr.dataset.href;
+  }));
+
+  $$("[data-new]", app).forEach(b => b.addEventListener("click", () => newRecord(b.dataset.new)));
+
+  const q = $("#listq", app);
+  if (q) q.addEventListener("input", () => {
+    lstate(key).q = q.value;
+    render();
+    const nq = $("#listq");
+    if (nq){ nq.focus(); nq.setSelectionRange(nq.value.length, nq.value.length); }
+  });
+
+  $$("[data-filter]", app).forEach(s => s.addEventListener("change", () => {
+    lstate(key).f[s.dataset.filter] = s.value; render();
+  }));
+
+  $$("[data-sort]", app).forEach(b => b.addEventListener("click", () => {
+    const st = lstate(key);
+    const dir = st.sort.k === b.dataset.sort ? -st.sort.dir : 1;
+    st.sort = {k:b.dataset.sort, dir:dir};
+    render();
+  }));
+
+  const tv = $("#toggle-view", app);
+  if (tv) tv.addEventListener("click", () => { const st = lstate("opportunities"); st.view = st.view === "list" ? "kanban" : "list"; render(); });
+
+  $$("[data-task]", app).forEach(cb => cb.addEventListener("change", () => {
+    const t = byId(DB.tasks, cb.dataset.task);
+    if (!t) return;
+    t.done = cb.checked; save();
+    toast(t.done ? "Task completed: " + t.subject.slice(0,40) : "Task reopened");
+    render();
+  }));
+
+  $$("[data-move]", app).forEach(b => b.addEventListener("click", e => { e.stopPropagation(); moveDialog(b.dataset.move); }));
+
+  $$(".kcard", app).forEach(c => {
+    c.addEventListener("dragstart", e => { e.dataTransfer.setData("text/plain", c.dataset.id); c.classList.add("drag"); });
+    c.addEventListener("dragend", () => c.classList.remove("drag"));
+  });
+  $$(".kcol", app).forEach(col => {
+    col.addEventListener("dragover", e => { e.preventDefault(); col.classList.add("over"); });
+    col.addEventListener("dragleave", () => col.classList.remove("over"));
+    col.addEventListener("drop", e => {
+      e.preventDefault(); col.classList.remove("over");
+      setStage(e.dataTransfer.getData("text/plain"), col.dataset.stage);
+    });
+  });
+
+  $$(".pstep", app).forEach(b => b.addEventListener("click", () => {
+    const step = b.dataset.step;
+    if (key === "opportunities") setStage(id, step);
+    else if (key === "cases"){ const c = byId(DB.cases,id); c.status = step; save(); logAuto("case", id, "Status changed to " + step); toast("Case moved to " + step); render(); }
+    else if (key === "leads"){ const l = byId(DB.leads,id); l.status = step; save(); logAuto("lead", id, "Status changed to " + step); toast("Lead moved to " + step); render(); }
+  }));
+
+  const ed = $("[data-edit]", app);      if (ed) ed.addEventListener("click", () => editRecord(key, id));
+  const dl = $("[data-del]", app);       if (dl) dl.addEventListener("click", () => deleteRecord(key, id));
+  const nt = $("[data-newtask]", app);   if (nt) nt.addEventListener("click", () => newTask(key, id));
+  $$("[data-log]", app).forEach(b => b.addEventListener("click", () => logActivity(key, id, b.dataset.log)));
+  const cv = $("[data-convert]", app);   if (cv) cv.addEventListener("click", () => convertLead(id));
+}
+
+/* ========================= ACTIONS ========================= */
+function setStage(oid, stage){
+  const o = byId(DB.opportunities, oid);
+  if (!o || o.stage === stage) return;
+  const from = o.stage;
+  o.stage = stage;
+  save();
+  logAuto("opportunity", oid, "Stage moved from " + from + " to " + stage + ".");
+  toast(stage === "Placed" ? "Placement won: " + o.name.split(" - ")[0] + "!" : "Moved to " + stage, stage === "Withdrawn" ? "warn" : "");
+  render();
+}
+function moveDialog(oid){
+  const o = byId(DB.opportunities, oid);
+  openModal("Move placement",
+    "<p style='margin-top:0'><b>"+esc(o.name)+"</b></p>" +
+    '<div style="display:flex;flex-direction:column;gap:.4rem">' +
+      STAGES.concat(["Withdrawn"]).map(s => '<button class="btn" data-s="'+esc(s)+'" style="justify-content:flex-start'+(s===o.stage?";background:var(--tint)":"")+'">'+esc(s)+(s===o.stage?" (current)":"")+"</button>").join("") +
+    "</div>", "",
+    root => $$("[data-s]", root).forEach(b => b.addEventListener("click", () => { closeModal(); setStage(oid, b.dataset.s); })));
+}
+function logAuto(t, id, text){
+  DB.activities.unshift({id:nextId("ac"), type:"note", who:"Robert Fischer", text:text, when:new Date().toISOString(), rel:{t:t, id:id}});
+  save();
+}
+function newRecord(key){
+  const o = OBJ[key];
+  openModal("New " + o.one, formHTML(o.form, defaultsFor(key)),
+    '<button class="btn" data-close>Cancel</button><button class="btn btn--brand" id="save-rec">Save</button>',
+    root => root.querySelector("#save-rec").addEventListener("click", () => {
+      const form = $("#recform");
+      if (!form.reportValidity()) return;
+      const rec = readForm();
+      rec.id = nextId(key[0]);
+      if (key === "cases"){ rec.num = String(1043 + DB.cases.length).padStart(8,"0"); rec.created = new Date().toISOString(); }
+      if (key === "leads") rec.created = iso(0);
+      DB[key].unshift(rec); save(); closeModal();
+      toast(o.one + " created: " + (rec.name || rec.subject));
+      location.hash = "#/" + key + "/" + rec.id;
+      render();
+    }));
+}
+function defaultsFor(key){
+  const d = {owner:"Robert Fischer"};
+  if (key === "opportunities"){ d.stage = "Inquiry"; d.close = iso(60); d.amount = 8900; }
+  if (key === "cases"){ d.status = "New"; d.priority = "Normal"; d.origin = "Phone"; }
+  if (key === "leads"){ d.status = "New"; d.rating = "Warm"; d.source = "Web Form"; }
+  if (key === "campaigns"){ d.status = "Planned"; d.start = iso(0); d.end = iso(30); d.leads = 0; d.converted = 0; }
+  if (key === "accounts") d.rating = "Warm";
+  return d;
+}
+function editRecord(key, id){
+  const o = OBJ[key], r = byId(DB[key], id);
+  openModal("Edit " + o.one, formHTML(o.form, r),
+    '<button class="btn" data-close>Cancel</button><button class="btn btn--brand" id="save-rec">Save</button>',
+    root => root.querySelector("#save-rec").addEventListener("click", () => {
+      if (!$("#recform").reportValidity()) return;
+      Object.assign(r, readForm()); save(); closeModal();
+      toast(o.one + " updated"); render();
+    }));
+}
+function deleteRecord(key, id){
+  const o = OBJ[key], r = byId(DB[key], id);
+  openModal("Delete " + o.one,
+    "<p>Delete <b>" + esc(o.title(r)) + "</b>? In this prototype that only affects your own browser.</p>",
+    '<button class="btn" data-close>Cancel</button><button class="btn btn--brand" style="background:var(--err);border-color:var(--err)" id="do-del">Delete</button>',
+    root => root.querySelector("#do-del").addEventListener("click", () => {
+      DB[key] = DB[key].filter(x => x.id !== id); save(); closeModal();
+      toast(o.one + " deleted", "warn");
+      location.hash = "#/" + key; render();
+    }));
+}
+function newTask(key, id){
+  const fields = [
+    {k:"subject",l:"Subject",req:true,full:true},
+    {k:"due",l:"Due Date",type:"date"},
+    {k:"priority",l:"Priority",opts:["High","Normal","Low"]},
+    {k:"owner",l:"Assigned To",opts:OWNERS()}
+  ];
+  openModal("New Task", formHTML(fields, {due:iso(3), priority:"Normal", owner:"Robert Fischer"}),
+    '<button class="btn" data-close>Cancel</button><button class="btn btn--brand" id="save-rec">Save</button>',
+    root => root.querySelector("#save-rec").addEventListener("click", () => {
+      if (!$("#recform").reportValidity()) return;
+      const t = readForm();
+      t.id = nextId("t"); t.done = false;
+      t.rel = (key && id && OBJ[key]) ? {t:singularOf(key), id:id} : {t:"account", id:"a1"};
+      DB.tasks.unshift(t); save(); closeModal();
+      toast("Task created"); render();
+    }));
+}
+function logActivity(key, id, type){
+  const label = type === "call" ? "Log a Call" : "Post a Note";
+  const fields = [
+    {k:"text",l:type === "call" ? "What was discussed?" : "Note",type:"textarea",req:true,full:true},
+    {k:"who",l:"Logged by",opts:OWNERS()}
+  ];
+  openModal(label, formHTML(fields, {who:"Robert Fischer"}),
+    '<button class="btn" data-close>Cancel</button><button class="btn btn--brand" id="save-rec">Save</button>',
+    root => root.querySelector("#save-rec").addEventListener("click", () => {
+      if (!$("#recform").reportValidity()) return;
+      const a = readForm();
+      if (!a.text.trim()) return;
+      DB.activities.unshift({id:nextId("ac"), type:type, who:a.who, text:a.text, when:new Date().toISOString(), rel:{t:singularOf(key), id:id}});
+      save(); closeModal();
+      toast(type === "call" ? "Call logged" : "Note posted"); render();
+    }));
+}
+function convertLead(id){
+  const l = byId(DB.leads, id);
+  openModal("Convert Lead",
+    "<p style='margin-top:0'>Converting <b>"+esc(l.name)+"</b> creates an Account, a Contact and a new Placement, then marks the lead as converted.</p>" +
+    formHTML([
+      {k:"accName",l:"Account Name",req:true},
+      {k:"type",l:"Account Type",opts:["Host Family","Partner School","Partner Agency","Sponsor"]},
+      {k:"oppName",l:"Placement Name",req:true,full:true},
+      {k:"amount",l:"Programme Fee (EUR)",type:"number"},
+      {k:"close",l:"Expected Close",type:"date"}
+    ], {accName:l.name, type:l.name.toLowerCase().includes("school")||l.name.toLowerCase().includes("academy")?"Partner School":"Host Family",
+        oppName:l.name + " - Placement 2027", amount:8900, close:iso(60)}),
+    '<button class="btn" data-close>Cancel</button><button class="btn btn--brand" id="do-conv">Convert</button>',
+    root => root.querySelector("#do-conv").addEventListener("click", () => {
+      if (!$("#recform").reportValidity()) return;
+      const f = readForm();
+      const acc = {id:nextId("a"), name:f.accName, type:f.type, city:l.city, country:l.country, phone:l.phone,
+                   website:"", owner:l.owner, rating:l.rating, seats:1, since:String(new Date().getFullYear())};
+      const con = {id:nextId("c"), name:l.contact, role:f.type === "Host Family" ? "Host Parent" : "School Coordinator",
+                   accountId:acc.id, title:l.title, email:l.email, phone:l.phone, city:l.city, country:l.country,
+                   lang:"-", owner:l.owner};
+      const opp = {id:nextId("o"), name:f.oppName, accountId:acc.id, contactId:con.id, stage:"Application Received",
+                   amount:Number(f.amount)||0, close:f.close, owner:l.owner, source:l.source, next:"Kick-off call with the new account."};
+      DB.accounts.unshift(acc); DB.contacts.unshift(con); DB.opportunities.unshift(opp);
+      l.status = "Qualified"; l.converted = true;
+      DB.activities.unshift({id:nextId("ac"), type:"note", who:l.owner,
+        text:"Lead converted into account " + acc.name + ", contact " + con.name + " and placement " + opp.name + ".",
+        when:new Date().toISOString(), rel:{t:"opportunity", id:opp.id}});
+      save(); closeModal();
+      toast("Lead converted - account, contact and placement created");
+      location.hash = "#/opportunities/" + opp.id; render();
+    }));
+}
+
+/* ========================= GLOBAL SEARCH ========================= */
+function globalSearch(term){
+  const t = term.trim().toLowerCase();
+  const box = $("#sres");
+  if (t.length < 2){ box.hidden = true; box.innerHTML = ""; return; }
+  const groups = ["leads","accounts","contacts","opportunities","cases"].map(k => {
+    const o = OBJ[k];
+    const hits = DB[k].filter(r => (o.title(r) + " " + (r.contact||"") + " " + (r.city||"") + " " + (r.email||"")).toLowerCase().includes(t)).slice(0,5);
+    return {k, o, hits};
+  }).filter(g => g.hits.length);
+
+  box.className = "sres";
+  box.hidden = false;
+  box.innerHTML = groups.length
+    ? groups.map(g => "<b>"+esc(g.o.label)+"</b>" + g.hits.map(r =>
+        '<button data-h="#/'+g.k+"/"+r.id+'"><span class="icon sm" style="background:'+g.o.color+'"><svg><use href="#'+g.o.icon+'"/></svg></span>' +
+        '<span><span style="font-weight:600;display:block">'+esc(g.o.title(r))+'</span><span style="font-size:.78rem;color:var(--text-2)">'+esc(g.o.sub(r))+"</span></span></button>").join("")).join("")
+    : '<div class="empty">No matches for "'+esc(term)+'". Try a student name, a family, or a city.</div>';
+
+  $$("button[data-h]", box).forEach(b => b.addEventListener("mousedown", e => {
+    e.preventDefault();
+    location.hash = b.dataset.h;
+    $("#gsearch").value = ""; box.hidden = true;
+  }));
+}
+
+/* ========================= HEADER ACTIONS ========================= */
+$("#gsearch").addEventListener("input", e => globalSearch(e.target.value));
+$("#gsearch").addEventListener("blur", () => setTimeout(() => { $("#sres").hidden = true; }, 150));
+$("#gsearch").addEventListener("focus", e => { if (e.target.value) globalSearch(e.target.value); });
+
+$("#btn-new").addEventListener("click", () => {
+  openModal("Create new record",
+    '<div class="grid g-2" style="gap:.5rem">' + Object.keys(OBJ).map(k =>
+      '<button class="btn" data-obj="'+k+'" style="justify-content:flex-start;padding:.6rem .7rem">' +
+      '<span class="icon sm" style="background:'+OBJ[k].color+'"><svg><use href="#'+OBJ[k].icon+'"/></svg></span>' +
+      esc(OBJ[k].one) + "</button>").join("") +
+      '<button class="btn" data-obj="task" style="justify-content:flex-start;padding:.6rem .7rem">' +
+      '<span class="icon sm" style="background:var(--o-task)"><svg><use href="#i-task"/></svg></span>Task</button>' +
+    "</div>", "",
+    root => $$("[data-obj]", root).forEach(b => b.addEventListener("click", () => {
+      const k = b.dataset.obj; closeModal();
+      if (k === "task") newTask(null, null); else newRecord(k);
+    })));
+});
+
+$("#btn-bell").addEventListener("click", () => {
+  const overdue = DB.tasks.filter(t => !t.done && daysTo(t.due) < 0);
+  const esc8 = DB.cases.filter(c => c.status === "Escalated");
+  const recent = DB.activities.slice().sort((a,b) => new Date(b.when)-new Date(a.when)).slice(0,4);
+  openModal("Notifications",
+    (overdue.length ? "<b>Overdue tasks</b>" + taskListHTML(overdue, true) : "") +
+    (esc8.length ? "<b style='display:block;margin-top:.75rem'>Escalated cases</b><ul class='tl'>" + esc8.map(c =>
+      '<li><span class="icon sm" style="background:var(--o-case)"><svg><use href="#i-case"/></svg></span>' +
+      '<div class="body"><div class="who">'+esc(c.subject)+'</div><div class="when">Case '+esc(c.num)+" - "+ago(c.created)+"</div></div></li>").join("") + "</ul>" : "") +
+    "<b style='display:block;margin-top:.75rem'>Latest activity</b>" + timelineHTML(recent, true), "");
+  $("#belldot").style.display = "none";
+});
+
+$("#btn-theme").addEventListener("click", () => {
+  const cur = document.documentElement.getAttribute("data-theme");
+  const next = cur === "dark" ? "light" : cur === "light" ? "dark"
+    : (window.matchMedia("(prefers-color-scheme: dark)").matches ? "light" : "dark");
+  document.documentElement.setAttribute("data-theme", next);
+  try{ localStorage.setItem("robertforce.theme", next); }catch(e){}
+});
+try{
+  const th = localStorage.getItem("robertforce.theme");
+  if (th) document.documentElement.setAttribute("data-theme", th);
+}catch(e){}
+
+/* ========================= BOOT ========================= */
+window.addEventListener("hashchange", render);
+if (!location.hash) location.hash = "#/home";
+render();
+</script>
