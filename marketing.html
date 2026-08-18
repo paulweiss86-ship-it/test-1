@@ -1,0 +1,286 @@
+<meta charset="utf-8">
+<title>Robert Force</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Source+Sans+3:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap">
+<style>
+:root{
+  --brand:#0176D3; --brand-2:#38A0F0; --navy:#032D60; --navy-2:#06498F;
+  --sky:#EAF5FE; --sky-2:#D8EDFF; --coral:#FF5C7A; --coral-soft:#FFE7ED;
+  --gold:#FCB95B; --green:#2E844A;
+  --ink:#0A1F3B; --ink-2:#48607F; --ink-3:#7C90A8;
+  --line:#E2E9F1; --sheet:#FFFFFF; --backdrop:#E7ECF2;
+  --hero:radial-gradient(120% 140% at 82% -10%, #38A0F0 0%, #0176D3 34%, #06498F 68%, #032D60 100%);
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{
+  background:var(--backdrop);
+  font-family:"Source Sans 3",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  color:var(--ink); -webkit-font-smoothing:antialiased;
+  padding:24px; display:flex; justify-content:center;
+}
+.mono{font-family:"IBM Plex Mono",ui-monospace,monospace}
+.disp{font-family:"Sora","Source Sans 3",sans-serif}
+
+/* ---- the printable sheet ---- */
+.page{
+  width:210mm; height:297mm; background:var(--sheet);
+  position:relative; overflow:hidden;
+  box-shadow:0 18px 60px rgba(3,45,96,.28);
+  display:flex; flex-direction:column;
+}
+
+/* ================= HERO ================= */
+.hero{
+  background:var(--hero); color:#fff; position:relative; overflow:hidden;
+  padding:8mm 14mm 8mm; flex:0 0 auto;
+}
+.hero::before{ /* cloud motif, faint */
+  content:""; position:absolute; right:-40px; top:-60px; width:340px; height:340px;
+  background:radial-gradient(circle at 30% 30%, rgba(255,255,255,.20), rgba(255,255,255,0) 62%);
+  border-radius:50%;
+}
+.hero::after{
+  content:""; position:absolute; left:-80px; bottom:-120px; width:300px; height:300px;
+  background:radial-gradient(circle at 50% 50%, rgba(255,255,255,.10), rgba(255,255,255,0) 60%);
+  border-radius:50%;
+}
+.brandbar{display:flex; align-items:center; gap:12px; position:relative; z-index:2}
+.cloud{
+  width:52px; height:36px; background:#fff; border-radius:999px; position:relative; flex:0 0 auto;
+  display:grid; place-items:center; box-shadow:0 4px 14px rgba(0,0,0,.18);
+}
+.cloud::before,.cloud::after{content:""; position:absolute; background:#fff; border-radius:50%}
+.cloud::before{width:23px; height:23px; top:-10px; left:8px}
+.cloud::after{width:16px; height:16px; top:-6px; left:27px}
+.cloud b{position:relative; z-index:2; color:var(--brand); font-weight:800; font-style:italic;
+  font-size:15px; letter-spacing:-.04em; font-family:"Sora",sans-serif}
+.wm{line-height:1.02}
+.wm .n{display:block; font-family:"Sora",sans-serif; font-weight:800; font-size:22px; letter-spacing:-.01em}
+.wm .s{display:block; font-size:10px; letter-spacing:.2em; text-transform:uppercase; opacity:.82; font-weight:600; margin-top:1px}
+.badge{
+  margin-left:auto; font-size:10.5px; letter-spacing:.14em; text-transform:uppercase; font-weight:700;
+  background:rgba(255,255,255,.16); border:1px solid rgba(255,255,255,.34); color:#fff;
+  padding:6px 12px; border-radius:999px; backdrop-filter:blur(2px);
+}
+.hero-eyebrow{
+  position:relative; z-index:2; margin-top:6mm; font-weight:700; letter-spacing:.16em;
+  text-transform:uppercase; font-size:11px; color:#CDE8FF; display:flex; align-items:center; gap:9px;
+}
+.hero-eyebrow::before{content:""; width:26px; height:2px; background:var(--coral); border-radius:2px}
+h1.headline{
+  position:relative; z-index:2; font-family:"Sora",sans-serif; font-weight:800;
+  font-size:31px; line-height:1.05; letter-spacing:-.02em; margin:8px 0 0; max-width:16.5em;
+  text-wrap:balance;
+}
+h1.headline .hl{color:#fff; position:relative; white-space:nowrap}
+h1.headline .hl::after{
+  content:""; position:absolute; left:-2px; right:-2px; bottom:2px; height:12px;
+  background:var(--coral); opacity:.9; z-index:-1; border-radius:3px; transform:skewX(-8deg);
+}
+.subhead{
+  position:relative; z-index:2; margin:11px 0 0; font-size:13px; line-height:1.46;
+  color:#E5F1FC; max-width:38em; font-weight:400;
+}
+.subhead b{color:#fff; font-weight:700}
+.hero-cta{position:relative; z-index:2; margin-top:13px; display:flex; align-items:center; gap:14px}
+.pill-btn{
+  background:#fff; color:var(--navy); font-family:"Sora",sans-serif; font-weight:700; font-size:13px;
+  padding:11px 20px; border-radius:999px; display:inline-flex; align-items:center; gap:9px;
+  box-shadow:0 8px 22px rgba(0,0,0,.22);
+}
+.pill-btn svg{width:15px; height:15px; fill:var(--coral)}
+.hero-cta .free{font-size:12px; color:#CDE8FF; font-weight:600}
+.hero-cta .free b{color:#fff}
+
+/* ================= BODY ================= */
+.body{padding:5mm 14mm 0; flex:0 0 auto}
+.sec-label{
+  font-family:"Sora",sans-serif; font-weight:700; font-size:11px; letter-spacing:.16em;
+  text-transform:uppercase; color:var(--brand); display:flex; align-items:center; gap:9px;
+}
+.sec-label::after{content:""; flex:1; height:1px; background:var(--line)}
+.sec-title{font-family:"Sora",sans-serif; font-weight:700; font-size:20px; letter-spacing:-.01em;
+  margin:6px 0 0; color:var(--ink)}
+
+/* feature grid */
+.features{display:grid; grid-template-columns:repeat(3,1fr); gap:7px; margin-top:10px}
+.feat{
+  border:1px solid var(--line); border-radius:12px; padding:11px 12px 12px; background:#fff;
+  position:relative; overflow:hidden;
+}
+.feat::before{content:""; position:absolute; inset:0 0 auto 0; height:3px; background:var(--fc,var(--brand))}
+.feat .ic{
+  width:34px; height:34px; border-radius:9px; display:grid; place-items:center; margin-bottom:8px;
+  background:var(--fcs,var(--sky)); 
+}
+.feat .ic svg{width:19px; height:19px; fill:var(--fc,var(--brand))}
+.feat h3{font-family:"Sora",sans-serif; font-weight:700; font-size:14px; margin:0 0 4px; letter-spacing:-.01em; line-height:1.15}
+.feat h3 sup{font-size:9px; color:var(--brand); vertical-align:super; font-weight:600}
+.feat p{margin:0; font-size:11px; line-height:1.36; color:var(--ink-2)}
+
+/* stats band */
+.stats{
+  margin-top:5mm; background:var(--navy); background-image:var(--hero); border-radius:14px;
+  padding:11px 20px; display:grid; grid-template-columns:repeat(4,1fr); gap:8px; color:#fff;
+  position:relative; overflow:hidden;
+}
+.stats::after{content:""; position:absolute; right:-30px; top:-40px; width:160px; height:160px;
+  background:radial-gradient(circle,rgba(255,255,255,.14),transparent 62%); border-radius:50%}
+.stat{position:relative; z-index:2; text-align:center; border-right:1px solid rgba(255,255,255,.18)}
+.stat:last-child{border-right:0}
+.stat .v{font-family:"IBM Plex Mono",monospace; font-weight:600; font-size:27px; line-height:1; letter-spacing:-.02em}
+.stat .v .u{font-size:15px; opacity:.85}
+.stat .l{font-size:10px; letter-spacing:.06em; text-transform:uppercase; color:#CDE8FF; margin-top:5px; font-weight:600}
+
+/* lower split: testimonial + CTA */
+.split{display:grid; grid-template-columns:1.15fr .85fr; gap:10px; margin-top:5mm}
+.quotes{display:flex; flex-direction:column; gap:8px}
+.quote{
+  border:1px solid var(--line); border-left:3px solid var(--coral); border-radius:10px;
+  padding:11px 13px; background:var(--coral-soft);
+}
+.quote.blue{border-left-color:var(--brand); background:var(--sky)}
+.quote p{margin:0; font-size:12px; line-height:1.4; color:var(--ink); font-weight:500; font-style:italic}
+.quote .by{margin-top:6px; font-size:10.5px; color:var(--ink-2); font-weight:600; font-style:normal}
+.quote .by b{color:var(--ink)}
+.stars{color:var(--gold); font-size:12px; letter-spacing:1px; margin-bottom:4px}
+
+.cta{
+  border:1px solid var(--sky-2); border-radius:12px; background:linear-gradient(180deg,#fff, var(--sky));
+  padding:14px; display:flex; gap:13px; align-items:center;
+}
+.qr{width:96px; height:96px; flex:0 0 auto; background:#fff; border:1px solid var(--line); border-radius:10px;
+  padding:8px; display:grid; place-items:center}
+.qr svg{width:100%; height:100%; display:block}
+.cta .txt{min-width:0}
+.cta .kick{font-family:"Sora",sans-serif; font-weight:700; font-size:15px; color:var(--navy); line-height:1.1; letter-spacing:-.01em}
+.cta .sub{font-size:11px; color:var(--ink-2); margin-top:4px; line-height:1.35}
+.cta .url{
+  margin-top:9px; font-family:"IBM Plex Mono",monospace; font-size:9.5px; color:var(--brand);
+  background:#fff; border:1px solid var(--sky-2); border-radius:6px; padding:5px 7px; word-break:break-all; font-weight:600;
+}
+
+/* footer */
+.foot{
+  margin-top:auto; padding:5mm 14mm 5mm; display:flex; align-items:flex-end; gap:14px;
+  border-top:1px solid var(--line);
+}
+.foot .fine{font-size:9px; line-height:1.45; color:var(--ink-3); max-width:70%}
+.foot .fine b{color:var(--ink-2)}
+.foot .rf{margin-left:auto; text-align:right; font-family:"Sora",sans-serif; font-weight:700; font-size:12px; color:var(--brand)}
+.foot .rf span{display:block; font-family:"Source Sans 3",sans-serif; font-weight:600; font-size:9px; letter-spacing:.14em; text-transform:uppercase; color:var(--ink-3); margin-top:2px}
+
+@media print{
+  @page{size:A4; margin:0}
+  body{background:#fff; padding:0; display:block}
+  .page{box-shadow:none; width:auto; min-height:auto}
+}
+</style>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+<symbol id="m-user" viewBox="0 0 24 24"><path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8Zm0 2c-4.4 0-8 2.2-8 5v1h16v-1c0-2.8-3.6-5-8-5Z"/></symbol>
+<symbol id="m-radar" viewBox="0 0 24 24"><path d="M12 2a10 10 0 1 0 10 10h-2a8 8 0 1 1-8-8V2Zm0 4a6 6 0 1 0 6 6h-2a4 4 0 1 1-4-4V6Zm0 4a2 2 0 1 0 2 2 2 2 0 0 0-2-2Z"/></symbol>
+<symbol id="m-pipe" viewBox="0 0 24 24"><path d="M3 4h5v16H3V4Zm6.5 0h5v11h-5V4ZM16 4h5v7h-5V4Z"/></symbol>
+<symbol id="m-cake" viewBox="0 0 24 24"><path d="M12 2c.9 1.2 1.6 2.1 1.6 2.9a1.6 1.6 0 0 1-3.2 0c0-.8.7-1.7 1.6-2.9ZM6 7h12a2 2 0 0 1 2 2v3c-1 0-1.4-1-2.5-1s-1.5 1-2.5 1-1.5-1-2.5-1-1.5 1-2.5 1-1.5-1-2.5-1S5 12 4 12V9a2 2 0 0 1 2-2Zm-2 7c1 0 1.5-1 2.5-1s1.5 1 2.5 1 1.5-1 2.5-1 1.5 1 2.5 1 1.5-1 2.5-1 1.5 1 2.5 1v6H4v-6Z"/></symbol>
+<symbol id="m-people" viewBox="0 0 24 24"><path d="M8.5 11a3 3 0 1 0 0-6 3 3 0 0 0 0 6Zm7.5.5a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5ZM8.5 13C5.5 13 1 14.4 1 17.2V19h15v-1.8c0-2.8-4.5-4.2-7.5-4.2Zm7.5.8c-.5 0-1 0-1.5.1 1.4.9 2.5 2.1 2.5 3.3V19h6v-1.6c0-2.4-3.6-3.6-7-3.6Z"/></symbol>
+<symbol id="m-heart" viewBox="0 0 24 24"><path d="M12 21S3 14.6 3 8.9A5 5 0 0 1 12 6a5 5 0 0 1 9 2.9C21 14.6 12 21 12 21Z"/></symbol>
+<symbol id="m-bolt" viewBox="0 0 24 24"><path d="M13 2 4 14h6l-1 8 9-12h-6l1-8z"/></symbol>
+</defs></svg>
+
+<div class="page">
+
+  <header class="hero">
+    <div class="brandbar">
+      <span class="cloud"><b>rf</b></span>
+      <span class="wm"><span class="n disp">Robert Force</span><span class="s">Relationship Cloud</span></span>
+      <span class="badge">v2.0 &middot; now shipping</span>
+    </div>
+
+    <div class="hero-eyebrow">The world's most eligible bachelor deserves enterprise software</div>
+    <h1 class="headline disp">One man. Every city. <span class="hl">Zero forgotten</span> birthdays.</h1>
+    <p class="subhead">Robert has a lot of people to keep up with &mdash; and a suspiciously good track record. <b>Robert Force</b> is the CRM that makes sure no name, no birthday, and no half-promised dinner ever slips through the cracks again. Charm, now with a backend.</p>
+    <div class="hero-cta">
+      <span class="pill-btn disp"><svg><use href="#m-heart"/></svg>Open the app</span>
+      <span class="free">Free forever. <b>No commitment required.</b> (For once.)</span>
+    </div>
+  </header>
+
+  <main class="body">
+    <div class="sec-label disp">Everything Robert needs, in one place</div>
+    <div class="sec-title disp">Six ways to never drop the ball again</div>
+
+    <section class="features">
+      <div class="feat" style="--fc:var(--brand);--fcs:var(--sky)">
+        <div class="ic"><svg><use href="#m-user"/></svg></div>
+        <h3>360&deg; Sweetheart View</h3>
+        <p>Every name, nickname, birthday and how you met &mdash; one tap away. Never open with &ldquo;hey&nbsp;you&rdquo; again.</p>
+      </div>
+      <div class="feat" style="--fc:var(--coral);--fcs:var(--coral-soft)">
+        <div class="ic"><svg><use href="#m-radar"/></svg></div>
+        <h3>Catch-Up Radar<sup>&trade;</sup></h3>
+        <p>The moment you&rsquo;ve gone quiet, Robert Force pings you. &ldquo;You never text first&rdquo; is now scientifically impossible.</p>
+      </div>
+      <div class="feat" style="--fc:var(--gold);--fcs:#FEF3D6">
+        <div class="ic"><svg><use href="#m-pipe"/></svg></div>
+        <h3>The Date Pipeline</h3>
+        <p>Drag every rendezvous from &ldquo;Idea&rdquo; to &ldquo;It happened.&rdquo; Three time zones, zero double-bookings.</p>
+      </div>
+      <div class="feat" style="--fc:#7A5AF0;--fcs:#EDE9FE">
+        <div class="ic"><svg><use href="#m-cake"/></svg></div>
+        <h3>Birthday Early-Warning</h3>
+        <p>Sixty days&rsquo; notice on every birthday. Show up with the right gift and an unearned reputation for thoughtfulness.</p>
+      </div>
+      <div class="feat" style="--fc:var(--green);--fcs:#D7F0DE">
+        <div class="ic"><svg><use href="#m-people"/></svg></div>
+        <h3>Circles Intelligence</h3>
+        <p>The Bangkok crew, the dive buddies, the cooking class. Know exactly who knows whom &mdash; before it gets awkward.</p>
+      </div>
+      <div class="feat" style="--fc:#E0479E;--fcs:#FCE7F3">
+        <div class="ic"><svg><use href="#m-heart"/></svg></div>
+        <h3>The Favour Ledger</h3>
+        <p>Who owes whom a coffee, a ride, a rain-check. Balanced books. Balanced karma. Everybody wins.</p>
+      </div>
+    </section>
+
+    <section class="stats">
+      <div class="stat"><div class="v">14</div><div class="l">Connections managed</div></div>
+      <div class="stat"><div class="v">6</div><div class="l">Cities, one legend</div></div>
+      <div class="stat"><div class="v">0</div><div class="l">Birthdays missed</div></div>
+      <div class="stat"><div class="v">100<span class="u">%</span></div><div class="l">Total recall</div></div>
+    </section>
+
+    <section class="split">
+      <div class="quotes">
+        <div class="sec-label disp" style="margin-bottom:2px">Rave reviews from the field</div>
+        <div class="quote">
+          <div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+          <p>&ldquo;I used to run my love life on memory and luck. Now I run it on Robert Force. Game changer.&rdquo;</p>
+          <div class="by"><b>Robert</b> &mdash; Founder, CEO &amp; Sole Power User</div>
+        </div>
+        <div class="quote blue">
+          <div class="stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
+          <p>&ldquo;He remembered my birthday <em>and</em> my dog&rsquo;s name. I have not fully recovered.&rdquo;</p>
+          <div class="by">A friend in Chiang Mai &mdash; <b>verified connection</b></div>
+        </div>
+      </div>
+
+      <div class="cta">
+        <div class="qr" id="qrbox"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 37 37" shape-rendering="crispEdges"><path stroke="#032D60" d="M0 0.5h7m2 0h2m4 0h1m5 0h1m1 0h1m2 0h1m3 0h7M0 1.5h1m5 0h1m3 0h1m2 0h1m2 0h1m3 0h1m3 0h1m2 0h2m1 0h1m5 0h1M0 2.5h1m1 0h3m1 0h1m1 0h1m2 0h3m4 0h1m2 0h1m4 0h1m3 0h1m1 0h3m1 0h1M0 3.5h1m1 0h3m1 0h1m1 0h1m1 0h1m4 0h4m1 0h1m1 0h1m2 0h3m2 0h1m1 0h3m1 0h1M0 4.5h1m1 0h3m1 0h1m1 0h1m1 0h2m1 0h1m2 0h2m1 0h1m1 0h3m1 0h1m2 0h1m1 0h1m1 0h3m1 0h1M0 5.5h1m5 0h1m1 0h2m6 0h2m2 0h2m5 0h1m2 0h1m5 0h1M0 6.5h7m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h7M8 7.5h1m3 0h2m1 0h8m1 0h1m3 0h1M0 8.5h1m1 0h5m2 0h2m2 0h1m1 0h2m4 0h1m3 0h2m3 0h5M0 9.5h1m1 0h1m1 0h1m5 0h4m1 0h1m2 0h1m1 0h2m1 0h3m2 0h2m5 0h1M0 10.5h1m2 0h1m2 0h1m1 0h2m1 0h1m2 0h3m1 0h2m1 0h2m4 0h1m2 0h2m2 0h3M7 11.5h3m1 0h5m3 0h3m4 0h2m1 0h1m1 0h3m2 0h1M0 12.5h1m1 0h1m1 0h6m1 0h3m1 0h1m1 0h1m1 0h2m1 0h1m1 0h2m1 0h1m1 0h2m1 0h5M0 13.5h1m2 0h3m1 0h1m5 0h1m2 0h1m1 0h2m3 0h1m7 0h1m3 0h1M3 14.5h1m1 0h6m1 0h5m1 0h1m1 0h1m1 0h1m4 0h2m2 0h3m2 0h1M0 15.5h4m1 0h1m3 0h1m2 0h5m2 0h2m2 0h1m2 0h3m1 0h3m2 0h1M2 16.5h3m1 0h1m1 0h4m2 0h1m3 0h6m1 0h4m1 0h1m1 0h1m1 0h1m1 0h1M0 17.5h1m1 0h1m4 0h1m2 0h1m4 0h2m6 0h3m3 0h1m4 0h2M0 18.5h3m3 0h1m1 0h3m1 0h2m3 0h2m1 0h2m3 0h5m5 0h2M1 19.5h2m1 0h2m2 0h2m2 0h3m1 0h1m1 0h1m2 0h2m1 0h1m1 0h3m1 0h1m1 0h2m2 0h1M0 20.5h1m2 0h2m1 0h1m2 0h6m2 0h2m3 0h1m1 0h3m2 0h2m1 0h1m1 0h1M1 21.5h4m2 0h1m2 0h2m1 0h1m3 0h1m1 0h1m1 0h1m1 0h2m3 0h1m4 0h1M0 22.5h1m1 0h2m2 0h2m1 0h9m3 0h1m3 0h3m2 0h4m1 0h2M0 23.5h3m4 0h1m2 0h1m1 0h4m1 0h2m1 0h3m4 0h3m1 0h2m3 0h1M0 24.5h1m1 0h1m1 0h1m1 0h1m3 0h1m1 0h2m2 0h1m4 0h1m3 0h1m1 0h1m2 0h3m1 0h3M0 25.5h3m1 0h2m1 0h2m1 0h4m1 0h1m2 0h1m1 0h5m1 0h1m2 0h1M0 26.5h1m2 0h2m1 0h6m1 0h4m1 0h2m2 0h1m2 0h1m1 0h1m2 0h1m1 0h2m1 0h2M0 27.5h1m1 0h2m1 0h1m1 0h3m4 0h2m2 0h4m2 0h1m1 0h5m5 0h1M0 28.5h1m2 0h1m1 0h2m3 0h2m3 0h3m1 0h2m1 0h1m1 0h13M8 29.5h1m1 0h3m1 0h1m3 0h3m2 0h1m3 0h2m3 0h2M0 30.5h7m2 0h1m5 0h2m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h1m1 0h3M0 31.5h1m5 0h1m1 0h1m1 0h2m1 0h1m5 0h1m6 0h1m1 0h1m3 0h2M0 32.5h1m1 0h3m1 0h1m1 0h3m2 0h3m2 0h1m1 0h3m1 0h9m1 0h3M0 33.5h1m1 0h3m1 0h1m1 0h1m3 0h2m1 0h2m4 0h1m1 0h1m1 0h1m3 0h2m1 0h2m2 0h1M0 34.5h1m1 0h3m1 0h1m1 0h1m4 0h2m5 0h2m3 0h2m2 0h1m4 0h3M0 35.5h1m5 0h1m2 0h1m2 0h1m1 0h1m1 0h1m4 0h2m3 0h3m1 0h1m1 0h2m2 0h1M0 36.5h7m1 0h6m2 0h3m3 0h1m1 0h3m2 0h2m1 0h1m1 0h3"/></svg></div>
+        <div class="txt">
+          <div class="kick disp">Scan. Swipe.<br>Stay in touch.</div>
+          <div class="sub">Point your camera here to open Robert Force. Works on any phone &mdash; no app store, no sign-up.</div>
+          <div class="url">claude.ai/code/artifact/741b0e39</div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="foot">
+    <p class="fine"><b>Robert Force&trade; Relationship Cloud.</b> A prototype built for one very lucky guy named Robert. No real hearts were harmed in the making of this software. Side effects may include suspiciously well-maintained friendships, an alarming memory for birthdays, and people asking how you&rsquo;re &ldquo;always so thoughtful.&rdquo; Charm sold separately.</p>
+    <div class="rf">Robert Force<span>Powered by good intentions</span></div>
+  </footer>
+
+</div>
